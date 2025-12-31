@@ -13,6 +13,7 @@ import {
   CardFooter,
   CardHeader,
 } from "@/components/ui/card";
+import { Avatar, AvatarImage } from "@radix-ui/react-avatar";
 
 export function Navbar() {
   return (
@@ -21,7 +22,15 @@ export function Navbar() {
         <Link href="/">LOGO</Link>
         <ul className="flex items-center gap-3">
           <li>
-            <Link href="/sign-up">Sign in</Link>
+            {/* <Link href="/sign-up">Sign in</Link> */}
+            <Link href="/listings/23432413">
+              <Avatar>
+                <AvatarImage
+                  src={"https://github.com/shadcn.png"}
+                  className="size-11 rounded-[100px]"
+                ></AvatarImage>
+              </Avatar>
+            </Link>
           </li>
           <li>
             <Button asChild>
@@ -73,7 +82,7 @@ export function ListingCard() {
 
 export default function Home() {
   return (
-    <section className="border max-w-6xl mx-auto mb-15">
+    <section className="max-w-6xl mx-auto mb-15">
       <SearchBox />
       <ul className="grid mt-10 grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-3 max-xl:px-5">
         {Array.from({ length: 20 }).map((_, index) => (

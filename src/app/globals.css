@@ -4,9 +4,13 @@
 @custom-variant dark (&:is(.dark *));
 
 body{
+  height: 100%;
+  width: 100%;
   overflow-x: hidden;
 }
-
+.no-scrollbar::-webkit-scrollbar{
+  scrollbar-width: none;
+}
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
