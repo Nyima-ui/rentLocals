@@ -22,15 +22,15 @@ export function Navbar() {
         <Link href="/">LOGO</Link>
         <ul className="flex items-center gap-3">
           <li>
-            {/* <Link href="/sign-up">Sign in</Link> */}
-            <Link href="/listings/23432413">
+            <Link href="/sign-up">Sign in</Link>
+            {/* <Link href="/listings/23432413">
               <Avatar>
                 <AvatarImage
                   src={"https://github.com/shadcn.png"}
                   className="size-11 rounded-[100px]"
                 ></AvatarImage>
               </Avatar>
-            </Link>
+            </Link> */}
           </li>
           <li>
             <Button asChild>

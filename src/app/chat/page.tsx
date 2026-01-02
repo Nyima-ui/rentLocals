@@ -1,3 +1,4 @@
+"use client";
 import { Avatar, AvatarImage } from "@radix-ui/react-avatar";
 import { SearchBox } from "../page";
 import {
@@ -12,16 +13,22 @@ import {
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { Send } from "lucide-react";
+import { useState } from "react";
 
-export function BookingInfo() {
+export function RenterBookingInfo() {
   return (
-    <Card className=" bg-transparent shadow-none">
+    <Card className="bg-transparent shadow-none">
       <CardHeader>
         <CardTitle>Bookign ID: 245634346</CardTitle>
         <CardDescription>Status: Requested</CardDescription>
       </CardHeader>
       <CardContent>
-        <CardTitle className="text-2xl">
+        <div className="max-w-xs border-b-2 pb-1.5">
+          <p className="text-base text-gray-700 leading-tight">
+            Pick up address is shown here after owner approves your request.
+          </p>
+        </div>
+        <CardTitle className="text-2xl mt-5">
           <Link href="/listing/asdf23452" className="leading-tight">
             XLR cables (long or short) one price
           </Link>
@@ -33,13 +40,8 @@ export function BookingInfo() {
               className="size-12 rounded-[100px]"
             />
           </Avatar>
-          <Button
-            asChild
-            variant="outline"
-            className="border-none bg-none hover:bg-transparent"
-          >
-            <Link href="#">Artur S</Link>
-          </Button>
+
+          <Link href="#">Artur S</Link>
         </div>
         {/* rental period */}
         <div className="mt-7">
@@ -76,10 +78,84 @@ export function BookingInfo() {
   );
 }
 
+export function OwnerBookingInfo() {
+  return (
+    <Card className="bg-transparent shadow-none gap-0">
+      <CardHeader>
+        <CardTitle>Bookign ID: 245634346</CardTitle>
+        <CardDescription>Status: Requested</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <CardTitle className="text-2xl mt-5">
+          <Link href="/listing/asdf23452" className="leading-tight">
+            XLR cables (long or short) one price
+          </Link>
+        </CardTitle>
+        <div className="border-b-2 border-red-300 pb-1.5 mt-3 max-w-xs">
+          <p>
+            <Link href="#" className="text-blue-600">
+              Martha P
+            </Link>{" "}
+            has requested to rent your listing.
+          </p>
+        </div>
+        <div className="max-w-xs border-b-2 pb-1.5 mt-2">
+          <p className="text-base text-gray-700 leading-tight">
+            Pick up address is shown here after you approve the request.
+          </p>
+        </div>
+        <div className="flex items-center gap-2 mt-6">
+          <Avatar>
+            <AvatarImage
+              src="https://github.com/shadcn.png"
+              className="size-12 rounded-[100px]"
+            />
+          </Avatar>
+
+          <Link href="#">Martha P.</Link>
+        </div>
+        {/* rental period */}
+        <div className="mt-3">
+          <div className="border grow text-center rounded-md py-1.5">
+            <p className="text-xl font-medium">2 Jan - 27 Jan</p>
+            <CardDescription className="text-gray-500">
+              Rental period
+            </CardDescription>
+          </div>
+        </div>
+        <div className="flex gap-10 mt-5">
+          <div className="border grow text-center rounded-md py-1.5">
+            <p className="text-xl font-medium">$27</p>
+            <CardDescription className="text-gray-500">
+              Price per day
+            </CardDescription>
+          </div>
+          <div className="border grow text-center rounded-md py-1.5">
+            <p className="text-xl font-medium">$270</p>
+            <CardDescription className="text-gray-500">
+              Total amount
+            </CardDescription>
+          </div>
+        </div>
+      </CardContent>
+      <CardFooter className="mt-5">
+        <CardAction className="mx-auto">
+          <Button className="cursor-pointer py-6">Approve Request</Button>
+        </CardAction>
+      </CardFooter>
+    </Card>
+  );
+}
+
 export function Chat() {
   return (
-    <div className="grow px-3 h-120  relative border rounded-md min-w-109.25 pt-3">
+    <div className="grow px-3 h-135  relative border rounded-md min-w-109.25 pt-3">
       <div className="h-105 overflow-y-scroll no-scrollbar pb-10">
+        <div className="bg-cyan-100 max-w-60 ml-3 my-5 px-2 py-1.5 border-l-2 border-cyan-300 text-sm">
+          <p>Date: 1st Jan, 2026</p>
+          <p>You request has been sent.</p>
+        </div>
+
         <div className="flex gap-3">
           <div>
             <Avatar>
@@ -122,51 +198,8 @@ export function Chat() {
             Lorem, ipsum.
           </div>
         </div>
-        <div className="flex gap-3 mt-5">
-          <div>
-            <Avatar>
-              <AvatarImage
-                src="https://github.com/shadcn.png"
-                className="size-12 rounded-[100px]"
-              />
-            </Avatar>
-          </div>
-          <div className="text-sm bg-gray-600 text-white max-w-70 rounded-b-lg px-2 py-1 rounded-tr-lg mt-7">
-            Lorem ipsum dolor sit, amet consectetur adipisicing elit. Ut
-            aspernatur, maxime excepturi saepe dignissimos dolorem. Fugiat iusto
-            assumenda distinctio voluptatibus.
-          </div>
-        </div>
-        <div className="flex gap-3 mt-5 justify-end">
-          <div className="text-sm bg-gray-600 text-white max-w-70 rounded-b-lg px-2 py-1 rounded-tl-lg mt-7">
-            Lorem ipsum dolor sit amet, consectetur adipisicing elit. Nemo,
-            quam!
-          </div>
-          <div>
-            <Avatar>
-              <AvatarImage
-                src="https://github.com/shadcn.png"
-                className="size-12 rounded-[100px]"
-              />
-            </Avatar>
-          </div>
-        </div>
-        <div className="flex gap-3 mt-5 justify-end">
-          <div className="text-sm bg-gray-600 text-white max-w-70 rounded-b-lg px-2 py-1 rounded-tl-lg mt-7">
-            Lorem ipsum dolor sit amet, consectetur adipisicing elit. Nemo,
-            quam!
-          </div>
-          <div>
-            <Avatar>
-              <AvatarImage
-                src="https://github.com/shadcn.png"
-                className="size-12 rounded-[100px]"
-              />
-            </Avatar>
-          </div>
-        </div>
       </div>
-      <div className="flex items-center justify-between absolute w-[90%] bottom-0.5">
+      <div className="flex items-center justify-between absolute w-[95%] bottom-0.5">
         <input
           type="text"
           placeholder="Message to Artur S"
@@ -181,11 +214,13 @@ export function Chat() {
 }
 
 const ChatPage = () => {
+  const [isRenter, setisRenter] = useState<boolean>(false);
   return (
-    <section className="max-w-6xl mx-auto max-xl:px-5">
+    <section className="max-w-6xl mx-auto max-xl:px-5 mb-15">
       <SearchBox />
       <div className="mt-17 flex justify-between max-md:flex-col gap-5">
-        <BookingInfo />
+        {/* <RenterBookingInfo /> */}
+        <OwnerBookingInfo />
         <Chat />
       </div>
     </section>

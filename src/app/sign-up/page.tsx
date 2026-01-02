@@ -1,5 +1,5 @@
 "use client";
-import { User } from "lucide-react";
+import { Form, User } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -16,13 +16,23 @@ const SignUp = () => {
   const [isSignUp, setIsSignUp] = useState<boolean>(false);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
 
-  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  function handleAvatarChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
 
     const previewUrl = URL.createObjectURL(file);
     setAvatarPreview(previewUrl);
-  };
+  }
+
+  async function handleImageUpload() {}
+  async function handleUploadUserData() {}
+  async function handleAuth(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault(); 
+    const form = e.currentTarget
+    const formData = new FormData(e.currentTarget)
+
+  }
+
   return (
     <main className="h-auto w-screen flex justify-center items-center py-10">
       <Card className="min-w-md">
@@ -32,21 +42,21 @@ const SignUp = () => {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <form>
+          <form onSubmit={handleAuth}>
             <FieldGroup>
               {isSignUp && (
                 <>
                   {/* profile picture  */}
                   <Field>
                     <FieldLabel htmlFor="picture">Profile Picture</FieldLabel>
-                    <Avatar className="rounded-lg">
+                    <Avatar className="size-15! flex items-center justify-center bg-gray-500 rounded-lg overflow-hidden">
                       {avatarPreview ? (
                         <AvatarImage
                           src={avatarPreview}
-                          className="size-20 rounded-lg"
+                          className="size-full object-cover"
                         />
                       ) : (
-                        <User className="border size-10 rounded-2xl" />
+                        <User className="text-white size-10 rounded-2xl" />
                       )}
                     </Avatar>
                     <Input
