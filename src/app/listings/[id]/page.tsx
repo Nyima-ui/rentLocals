@@ -9,7 +9,7 @@ import Link from "next/link";
 import { ImageIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
-import { supabase } from "@/utils/supabase";
+import { createClient } from "@/lib/supabase/client";
 
 interface DeleteConfirmationModalProps {
   setIsDeleteModalOpen: React.Dispatch<React.SetStateAction<boolean>>;

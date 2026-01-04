@@ -8,7 +8,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { SearchBox } from "../page";
+import { SearchBox } from "@/app/page";
 import { SelectContent } from "@radix-ui/react-select";
 
 export function CreateListingForm() {

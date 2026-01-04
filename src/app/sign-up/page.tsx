@@ -12,13 +12,14 @@ import {
 } from "@/components/ui/field";
 import { Avatar, AvatarImage } from "@radix-ui/react-avatar";
 import { Input } from "@/components/ui/input";
-import { supabase } from "@/utils/supabase";
+import { createClient } from "@/lib/supabase/client";
 
 const SignUp = () => {
   const [isSignUp, setIsSignUp] = useState<boolean>(false);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const [isVerifying, setIsVerifying] = useState<boolean>(false);
   const [profilePicture, setProfilePicture] = useState<File | null>(null);
+  const supabase = createClient();
   const router = useRouter();
 
   function handleAvatarChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -97,8 +98,8 @@ const SignUp = () => {
       if (error) {
         console.error(`Error signing in: ${error.message}`);
         return;
-      }else{
-        router.push("/")
+      } else {
+        router.push("/");
       }
     }
   }

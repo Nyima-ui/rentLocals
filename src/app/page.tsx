@@ -16,14 +16,15 @@ import {
 } from "@/components/ui/card";
 import { Avatar, AvatarImage } from "@radix-ui/react-avatar";
 import { useEffect, useState } from "react";
-import { supabase } from "@/utils/supabase";
+import { createClient } from "@/lib/supabase/client";
 import type { User } from "@supabase/supabase-js";
 import { useRouter } from "next/navigation";
 
 export function Navbar() {
   const [user, setUser] = useState<User | null>(null);
   const [isSubMenuOpened, setisSubMenuOpened] = useState<boolean>(false);
-  const router = useRouter()
+  const router = useRouter();
+  const supabase = createClient();
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
@@ -36,8 +37,7 @@ export function Navbar() {
     });
 
     return () => subscription.unsubscribe();
-  }, []);
-
+  }, [supabase.auth]);
 
   return (
     <header className="max-w-6xl mx-auto max-xl:px-5">
@@ -59,7 +59,7 @@ export function Navbar() {
               <Link href="/sign-up">Sign in</Link>
             )}
             {isSubMenuOpened && (
-              <ul className="absolute top-[110%] -left-2 bg-gray-300 py-1 px-3 rounded-sm">
+              <ul className="absolute top-[110%] -left-2 bg-gray-300 py-1 px-3 rounded-sm z-10">
                 <li className="hover:opacity-65">
                   <Link
                     href={`listings/${user?.id}`}
@@ -74,7 +74,7 @@ export function Navbar() {
                     onClick={() => {
                       supabase.auth.signOut();
                       setisSubMenuOpened(false);
-                      router.push("/")
+                      router.push("/");
                     }}
                   >
                     Log out
