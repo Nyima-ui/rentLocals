@@ -12,17 +12,7 @@ import {
 } from "@/components/ui/field";
 import { Avatar, AvatarImage } from "@radix-ui/react-avatar";
 import { Input } from "@/components/ui/input";
-import { supabase } from "@/utils/supbase";
-import type { Session } from "@supabase/supabase-js";
-
-interface UserDetails {
-  phone: string;
-  avatar: string | null;
-  first_name: string;
-  last_name: string;
-  rating?: number;
-  is_admin?: boolean;
-}
+import { supabase } from "@/utils/supabase";
 
 const SignUp = () => {
   const [isSignUp, setIsSignUp] = useState<boolean>(false);
@@ -63,49 +53,53 @@ const SignUp = () => {
     return data.publicUrl;
   }
 
-  async function insertUserData(userDetails: UserDetails, session : Session) {
-    const { error } = await supabase
-      .from("users")
-      .update(userDetails)
-      .eq("user_id", session.user.id);
-    if (error) {
-      console.error(`Error uploading user details: ${error.message}`);
-      return;
-    }
-  }
   async function handleAuth(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const form = e.currentTarget;
     const formData = new FormData(form);
 
     const email = formData.get("email") as string;
+    const password = formData.get("password") as string;
     const phone = formData.get("phone") as string;
     const firstName = formData.get("first-name") as string;
     const lastName = formData.get("last-name") as string;
-    const password = formData.get("password") as string;
     let avatar: string | null = null;
     if (profilePicture) {
       avatar = await uploadImage(profilePicture, firstName);
     }
 
     if (isSignUp) {
-      const { data, error } = await supabase.auth.signUp({ email, password });
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            phone,
+            first_name: firstName,
+            last_name: lastName,
+            avatar,
+          },
+        },
+      });
       if (error) {
-        console.error(`Error creating account: ${error.message}`);
+        console.error(`Error signing up: ${error.message}`);
         return;
       }
       if (data.user && !data.session) {
         setIsVerifying(true);
+        return;
       }
-
-      const userDetails = {
-        phone,
-        first_name: firstName,
-        last_name: lastName,
-        avatar,
-      };
-
-      if (data.session) insertUserData(userDetails, data.session);
+    } else {
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+      if (error) {
+        console.error(`Error signing in: ${error.message}`);
+        return;
+      }else{
+        router.push("/")
+      }
     }
   }
 
@@ -223,7 +217,7 @@ const SignUp = () => {
                 )}
                 <FieldGroup>
                   <Field>
-                    <Button type="submit">
+                    <Button type="submit" className="cursor-pointer">
                       {isSignUp ? "Create Account" : "Sign In"}
                     </Button>
                     <Button variant="outline" type="button">

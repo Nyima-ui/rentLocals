@@ -1,3 +1,4 @@
+"use client";
 import { Button } from "@/components/ui/button";
 import { SearchIcon } from "lucide-react";
 import {
@@ -14,23 +15,73 @@ import {
   CardHeader,
 } from "@/components/ui/card";
 import { Avatar, AvatarImage } from "@radix-ui/react-avatar";
+import { useEffect, useState } from "react";
+import { supabase } from "@/utils/supabase";
+import type { User } from "@supabase/supabase-js";
+import { useRouter } from "next/navigation";
 
 export function Navbar() {
+  const [user, setUser] = useState<User | null>(null);
+  const [isSubMenuOpened, setisSubMenuOpened] = useState<boolean>(false);
+  const router = useRouter()
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data }) => {
+      setUser(data.session?.user ?? null);
+    });
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+
   return (
     <header className="max-w-6xl mx-auto max-xl:px-5">
       <nav className="flex justify-between items-center py-4">
         <Link href="/">LOGO</Link>
-        <ul className="flex items-center gap-3">
+        <ul className="flex items-center gap-3 relative">
           <li>
-            <Link href="/sign-up">Sign in</Link>
-            {/* <Link href="/listings/23432413">
-              <Avatar>
+            {user ? (
+              <Avatar
+                className="size-11! overflow-hidden flex items-center justify-center rounded-[100px] cursor-pointer"
+                onClick={() => setisSubMenuOpened((prev) => !prev)}
+              >
                 <AvatarImage
-                  src={"https://github.com/shadcn.png"}
-                  className="size-11 rounded-[100px]"
+                  src={user?.user_metadata?.avatar}
+                  className="object-cover"
                 ></AvatarImage>
               </Avatar>
-            </Link> */}
+            ) : (
+              <Link href="/sign-up">Sign in</Link>
+            )}
+            {isSubMenuOpened && (
+              <ul className="absolute top-[110%] -left-2 bg-gray-300 py-1 px-3 rounded-sm">
+                <li className="hover:opacity-65">
+                  <Link
+                    href={`listings/${user?.id}`}
+                    onClick={() => setisSubMenuOpened(false)}
+                  >
+                    Listings
+                  </Link>
+                </li>
+                <li className="hover:opacity-65">
+                  <button
+                    className="size-full"
+                    onClick={() => {
+                      supabase.auth.signOut();
+                      setisSubMenuOpened(false);
+                      router.push("/")
+                    }}
+                  >
+                    Log out
+                  </button>
+                </li>
+              </ul>
+            )}
           </li>
           <li>
             <Button asChild>
