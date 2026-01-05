@@ -15,29 +15,16 @@ import {
   CardHeader,
 } from "@/components/ui/card";
 import { Avatar, AvatarImage } from "@radix-ui/react-avatar";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
-import type { User } from "@supabase/supabase-js";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/context/AuthContext";
 
 export function Navbar() {
-  const [user, setUser] = useState<User | null>(null);
   const [isSubMenuOpened, setisSubMenuOpened] = useState<boolean>(false);
-  const router = useRouter();
   const supabase = createClient();
-
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
-      setUser(data.session?.user ?? null);
-    });
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
-    });
-
-    return () => subscription.unsubscribe();
-  }, [supabase.auth]);
+  const router = useRouter();
+  const { user } = useAuth();
 
   return (
     <header className="max-w-6xl mx-auto max-xl:px-5">
