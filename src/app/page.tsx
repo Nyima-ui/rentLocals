@@ -19,9 +19,17 @@ import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@radix-ui/react-dropdown-menu";
 
 export function Navbar() {
-  const [isSubMenuOpened, setisSubMenuOpened] = useState<boolean>(false);
+  const [isDropDownOpen, setIsDropDownOpen] = useState<boolean>(false);
   const supabase = createClient();
   const router = useRouter();
   const { user } = useAuth();
@@ -33,41 +41,44 @@ export function Navbar() {
         <ul className="flex items-center gap-3 relative">
           <li>
             {user ? (
-              <Avatar
-                className="size-11! overflow-hidden flex items-center justify-center rounded-[100px] cursor-pointer"
-                onClick={() => setisSubMenuOpened((prev) => !prev)}
+              <DropdownMenu
+                open={isDropDownOpen}
+                onOpenChange={setIsDropDownOpen}
               >
-                <AvatarImage
-                  src={user?.user_metadata?.avatar}
-                  className="object-cover"
-                ></AvatarImage>
-              </Avatar>
-            ) : (
-              <Link href="/sign-up">Sign in</Link>
-            )}
-            {isSubMenuOpened && (
-              <ul className="absolute top-[110%] -left-2 bg-gray-300 py-1 px-3 rounded-sm z-10">
-                <li className="hover:opacity-65">
-                  <Link
-                    href={`listings/${user?.id}`}
-                    onClick={() => setisSubMenuOpened(false)}
+                <DropdownMenuTrigger>
+                  <Avatar className="size-11! overflow-hidden flex items-center justify-center rounded-[100px] cursor-pointer">
+                    <AvatarImage
+                      src={user?.user_metadata?.avatar}
+                      className="object-cover"
+                    ></AvatarImage>
+                  </Avatar>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="bg-gray-300 rounded-md px-3 py-2 z-10">
+                  <DropdownMenuLabel className="font-medium">
+                    My Account
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    onSelect={() => setIsDropDownOpen(false)}
+                    asChild
                   >
-                    Listings
-                  </Link>
-                </li>
-                <li className="hover:opacity-65">
-                  <button
-                    className="size-full"
-                    onClick={() => {
-                      supabase.auth.signOut();
-                      setisSubMenuOpened(false);
+                    <Link href={`/listings/${user?.id}`}>Listings</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onSelect={async () => {
+                      await supabase.auth.signOut();
+                      setIsDropDownOpen(false);
                       router.push("/");
                     }}
+                    asChild
+                    className="cursor-pointer block"
                   >
-                    Log out
-                  </button>
-                </li>
-              </ul>
+                    <button>Log out</button>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <Link href="/sign-up">Sign in</Link>
             )}
           </li>
           <li>

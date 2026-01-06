@@ -15,6 +15,7 @@ import { useAuth } from "@/context/AuthContext";
 import { createClient } from "@/lib/supabase/client";
 import { Image as ImageIcon } from "lucide-react";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
 interface ListingPrices {
   price_day: number;
@@ -25,6 +26,7 @@ interface ListingPrices {
 export function CreateListingForm() {
   const supabase = createClient();
   const { user } = useAuth();
+  const router = useRouter();
 
   const [imagePreviews, setImagePreviews] = useState<(string | null)[]>(
     Array(6).fill(null)
@@ -133,11 +135,14 @@ export function CreateListingForm() {
       if (preview) URL.revokeObjectURL(preview);
     });
 
+    router.push(`listings/${user?.id}`);
+
     setImagePreviews(Array(6).fill(null));
     setListingImages(Array(6).fill(null));
 
     form.reset();
   }
+
   return (
     <div className="my-14">
       <h1 className="text-3xl mt-5">Post your listing</h1>
@@ -266,9 +271,14 @@ export function CreateListingForm() {
               required
               name="pickup-location"
             />
-            <Button variant="outline" className="max-w-xs">
+            {/* <Button
+              variant="outline"
+              type="button"
+              className="max-w-xs bg-transparent border"
+              onClick={addLocation}
+            >
               Use my location
-            </Button>
+            </Button> */}
           </Field>
           <Field>
             <Button type="submit" className="max-w-xs cursor-pointer">

@@ -1,14 +1,20 @@
 "use client";
 import { SearchBox } from "@/app/page";
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardAction, CardContent, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarImage } from "@radix-ui/react-avatar";
 import Link from "next/link";
+import { useParams } from "next/navigation";
+import { createClient } from "@/lib/supabase/client";
 
-export function ListingImage() {
+interface ListingImageProps {
+  listing: Listing;
+}
+
+export function ListingImage({ listing }: ListingImageProps) {
   const [imageDisplayed, setImageDisplayed] = useState<string>("/file.svg");
   return (
     <div className="w-full max-md:w-full">
@@ -68,7 +74,7 @@ export function ListingInfo() {
         <p className="text-gray-500">Price for 1 day</p>
       </div>
       <Button className="mt-5" asChild>
-         <Link href="/chat">Request Booking</Link>
+        <Link href="/chat">Request Booking</Link>
       </Button>
       <div className="mt-10">
         <p className="text-lg">Price for all periods:</p>
@@ -131,14 +137,57 @@ export function OwnerInfo() {
   );
 }
 
+interface Listing {
+  category: string[];
+  created_at: string;
+  description: string;
+  images: string[];
+  is_active: boolean;
+  is_featured: boolean;
+  listing_id: string;
+  pickup_location: string;
+  title: string;
+  updated_at: string;
+  user_id: string;
+}
+
 const Listing = () => {
+  const [listingData, setListingData] = useState<Listing | null>(null);
+  const { id } = useParams();
+  const supabase = createClient();
+
+  useEffect(() => {
+    async function fetchListing() {
+      const { data, error } = await supabase
+        .from("listings")
+        .select()
+        .eq("listing_id", id)
+        .single();
+
+      if (error) {
+        console.error(
+          `Error fetching data in single listing page: ${error.message}`
+        );
+        alert("Error fetching data in single listing page.");
+      }
+
+      if (data) setListingData(data);
+    }
+    fetchListing();
+  }, [id, supabase]);
+
+  if (!listingData)
+    return (
+      <p className="max-w-6xl mx-auto my-10 max-xl:px-5 text-2xl">Loading...</p>
+    );
+
   return (
     <section>
       <SearchBox />
       <section className="max-w-6xl mx-auto my-10  max-xl:px-5">
         <div className="flex gap-5 max-md:flex-col justify-between">
-          <ListingImage />
-          <ListingInfo />
+          <ListingImage listing={listingData} />
+          <ListingInfo listing={listingData} />
         </div>
         <OwnerInfo />
       </section>

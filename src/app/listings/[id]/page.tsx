@@ -12,58 +12,22 @@ import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useAuth } from "@/context/AuthContext";
 import Image from "next/image";
-
-interface DeleteConfirmationModalProps {
-  setIsDeleteModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
-}
-
-export function DeleteConfirmationModal({
-  setIsDeleteModalOpen,
-}: DeleteConfirmationModalProps) {
-  return (
-    <div
-      id="dialog"
-      className="fixed top-0 left-0 h-screen w-screen bg-black/70 flex justify-center items-center"
-      onClick={() => setIsDeleteModalOpen(false)}
-    >
-      <div
-        className="bg-white max-w-sm rounded-md px-5 py-6 space-y-5"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <h2 className="text-2xl">Delete this listing?</h2>
-        <p className="leading-tight">
-          If you delete this listing, it will be permanently removed and cannot
-          be recovered.
-        </p>
-        <div className="flex gap-3">
-          <Button
-            variant="outline"
-            className="grow cursor-pointer"
-            onClick={() => setIsDeleteModalOpen(false)}
-          >
-            Cancel
-          </Button>
-          <Button
-            className="grow cursor-pointer bg-red-500/95 hover:bg-red-500"
-            onClick={() => setIsDeleteModalOpen(false)}
-          >
-            Delete
-          </Button>
-        </div>
-      </div>
-    </div>
-  );
-}
+import {
+  Dialog,
+  DialogDescription,
+  DialogTitle,
+  DialogTrigger,
+  DialogHeader,
+  DialogContent,
+  DialogFooter,
+} from "@/components/ui/dialog";
 
 interface MyListingCardProps {
-  setIsDeleteModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
   listing: Listing;
 }
 
-export function MyListingCard({
-  setIsDeleteModalOpen,
-  listing,
-}: MyListingCardProps) {
+export function MyListingCard({ listing }: MyListingCardProps) {
+  const [open, setOpen] = useState(false);
   return (
     <li className="max-w-55">
       <Card className="p-0 overflow-hidden gap-2 pb-3">
@@ -85,18 +49,36 @@ export function MyListingCard({
         <CardFooter className="px-2 flex-col gap-3">
           <div className="flex w-full gap-3">
             <Button variant={"outline"} className="grow" asChild>
-              <Link href="/edit-listing/2343Sfs">Edit</Link>
+              <Link href={`/edit-listing/${listing.listing_id}`}>Edit</Link>
             </Button>
             <Button variant={"outline"} className="grow" asChild>
-              <Link href="/listing/234fsdf">Preview</Link>
+              <Link href={`/listing/${listing.listing_id}`}>Preview</Link>
             </Button>
           </div>
-          <Button
-            className="bg-red-600/95 hover:bg-red-500 w-full cursor-pointer"
-            onClick={() => setIsDeleteModalOpen(true)}
-          >
-            Delete
-          </Button>
+          <Dialog open={open} onOpenChange={setOpen}>
+            <DialogTrigger asChild>
+              <Button className="bg-red-600/95 hover:bg-red-500 w-full cursor-pointer">
+                Delete
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Delete this listing?</DialogTitle>
+                <DialogDescription>
+                  If you delete this listing, it will be permanently removed and
+                  cannot be recovered.
+                </DialogDescription>
+              </DialogHeader>
+              <DialogFooter>
+                <Button variant={"outline"} onClick={() => setOpen(false)}>
+                  Cancel
+                </Button>
+                <Button className="bg-red-600/95 hover:bg-red-500">
+                  Delete
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
         </CardFooter>
       </Card>
     </li>
@@ -118,7 +100,6 @@ interface Listing {
 }
 
 const Listings = () => {
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState<boolean>(false);
   const [listings, setListings] = useState<Listing[]>([]);
   const supabase = createClient();
   const { user } = useAuth();
@@ -147,16 +128,9 @@ const Listings = () => {
       <h1 className="text-3xl max-xl:px-5">Your listings</h1>
       <ul className="grid mt-7 grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-3 max-xl:px-5">
         {listings.map((item, index) => (
-          <MyListingCard
-            key={index}
-            setIsDeleteModalOpen={setIsDeleteModalOpen}
-            listing={item}
-          />
+          <MyListingCard key={index} listing={item} />
         ))}
       </ul>
-      {isDeleteModalOpen && (
-        <DeleteConfirmationModal setIsDeleteModalOpen={setIsDeleteModalOpen} />
-      )}
     </section>
   );
 };
