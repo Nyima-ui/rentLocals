@@ -14,14 +14,9 @@ import { SelectContent } from "@radix-ui/react-select";
 import { useAuth } from "@/context/AuthContext";
 import { createClient } from "@/lib/supabase/client";
 import { Image as ImageIcon } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-
-interface ListingPrices {
-  price_day: number;
-  price_week: number;
-  price_month: number;
-}
+import { X as CloseIcon } from "lucide-react";
 
 export function CreateListingForm() {
   const supabase = createClient();
@@ -34,6 +29,7 @@ export function CreateListingForm() {
   const [listingImages, setListingImages] = useState<(File | null)[]>(
     Array(6).fill(null)
   );
+  const imagePreviewsRef = useRef(imagePreviews)
 
   async function uploadListingImages(listingId: string) {
     const uploadedUrls: string[] = [];
@@ -72,7 +68,7 @@ export function CreateListingForm() {
     const file = e.target.files?.[0];
     if (!file) return;
     if (!file.type.startsWith("image/")) {
-      alert("Please upload a valid imaeg file.");
+      alert("Please upload a valid image file.");
       return;
     }
     const previewUrl = URL.createObjectURL(file);
@@ -143,6 +139,18 @@ export function CreateListingForm() {
     form.reset();
   }
 
+  useEffect(() => {
+    
+  }, [])
+
+  function removeImage(idx: number) {
+    setImagePreviews((prev) => {
+      const updated = [...prev];
+      updated[idx] = null;
+      return updated;
+    });
+  }
+
   return (
     <div className="my-14">
       <h1 className="text-3xl mt-5">Post your listing</h1>
@@ -199,8 +207,13 @@ export function CreateListingForm() {
             <div className="grid grid-cols-3 gap-3 max-sm:grid-cols-2">
               {Array.from({ length: 6 }).map((_, idx) => {
                 const inputId = `listing-image-${idx}`;
+                const hasPreviewImage = imagePreviews[idx];
+
                 return (
-                  <div key={idx} className="shadow-sm">
+                  <div
+                    key={idx}
+                    className="shadow-sm relative"
+                  >
                     <Input
                       type="file"
                       accept="image/*"
@@ -210,17 +223,25 @@ export function CreateListingForm() {
                     />
                     <label
                       htmlFor={inputId}
-                      className="h-40 bg-gray-400 rounded-md flex items-center justify-center cursor-pointer bg-cover bg-no-repeat bg-center"
+                      className="h-40 bg-gray-400 rounded-md flex items-center justify-center cursor-pointer bg-cover bg-no-repeat bg-center relative"
                       style={{
-                        backgroundImage: imagePreviews[idx]
+                        backgroundImage: hasPreviewImage
                           ? `url("${imagePreviews[idx]}")`
                           : "none",
                       }}
                     >
-                      {!imagePreviews[idx] && (
+                      {!hasPreviewImage && (
                         <ImageIcon size={50} className="text-white/70" />
                       )}
                     </label>
+                    {hasPreviewImage && (
+                      <button
+                        className="absolute top-1.5 right-2 cursor-pointer hover:bg-gray-200/50 transition-all duration-100 ease-in rounded-md"
+                        onClick={() => removeImage(idx)}
+                      >
+                        <CloseIcon className="text-red-500" size={27} />
+                      </button>
+                    )}
                   </div>
                 );
               })}
@@ -275,7 +296,11 @@ export function CreateListingForm() {
               variant="outline"
               type="button"
               className="max-w-xs bg-transparent border"
-              onClick={addLocation}
+              onClick={() =>
+                deleteAnImage(
+                  "153b1703-53ee-45ad-bcd4-d15d5262fa71/c3ba19cb-6d0f-46c3-b39c-0241f66d0d89/1-1767758191686.jpg"
+                )
+              }
             >
               Use my location
             </Button> */}

@@ -10,54 +10,55 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
-interface ListingImageProps {
+interface ListingSectionProps {
   listing: Listing;
 }
 
-export function ListingImage({ listing }: ListingImageProps) {
-  const [imageDisplayed, setImageDisplayed] = useState<string>("/file.svg");
+export function ListingImage({ listing }: ListingSectionProps) {
+  const [imageDisplayed, setImageDisplayed] = useState<string>(
+    listing?.images[0]
+  );
+  const { images } = listing;
   return (
-    <div className="w-full max-md:w-full">
-      <div className="bg-gray-400 h-100 w-full">
-        <Image height={50} width={50} alt="some svg" src={imageDisplayed} />
+    <div className="w-[60%] max-md:w-full">
+      <div className="bg-gray-400 h-100 w-full relative">
+        <Image
+          fill
+          preload={true}
+          loading="eager"
+          fetchPriority="high"
+          sizes="(max-width: 768px) 100vw, 60vw"
+          alt={listing?.title}
+          src={imageDisplayed}
+          className="object-cover"
+        />
       </div>
       <ul className="flex mt-2 gap-2 justify-end">
-        <li className="bg-gray-400 size-15">
-          <Image
-            height={50}
-            width={50}
-            alt="some svg"
-            src={"/file.svg"}
-            onClick={() => setImageDisplayed("/file.svg")}
-          />
-        </li>
-        <li className="bg-gray-400 size-15">
-          <Image
-            height={50}
-            width={50}
-            alt="some svg"
-            src={"/globe.svg"}
-            onClick={() => setImageDisplayed("/globe.svg")}
-          />
-        </li>
-        <li
-          className="bg-gray-400 size-15"
-          onClick={() => setImageDisplayed("/next.svg")}
-        >
-          <Image height={50} width={50} alt="some svg" src={"/next.svg"} />
-        </li>
+        {images.map((img, idx) => (
+          <li key={idx} className="size-12.5 relative">
+            <Image
+              fill
+              preload={true}
+              loading="eager"
+              src={img}
+              alt="thumbnail"
+              fetchPriority="high"
+              className="object-cover"
+              sizes="(max-width: 768px) 100vw, 60vw"
+              onClick={() => setImageDisplayed(img)}
+            />
+          </li>
+        ))}
       </ul>
     </div>
   );
 }
 
-export function ListingInfo() {
+export function ListingInfo({ listing }: ListingSectionProps) {
   return (
-    <div className="grow space-y-3">
-      <h1 className="text-4xl font-medium leading-12">
-        Xp-pen innovator display 16 drawing tablet (15.6)
-      </h1>
-      <div className="flex items-center justify-between max-w-xs mt-10">
+    <div className="grow space-y-3 w-1/2 max-md:w-full">
+      <h1 className="text-4xl font-medium leading-tighter">{listing?.title}</h1>
+      <div className="flex items-center justify-between max-w-xs mt-10 ">
         <label htmlFor="start-date" className="text-nowrap">
           Start date:
         </label>
@@ -97,7 +98,7 @@ export function ListingInfo() {
   );
 }
 
-export function OwnerInfo() {
+export function OwnerInfo({ listing }: ListingSectionProps) {
   return (
     <Card className="flex flex-row items-start max-lg:flex-col mt-10 justify-between bg-transparent border-none shadow-none">
       <div className="flex items-start max-md:flex-col max-md:gap-5">
@@ -129,9 +130,7 @@ export function OwnerInfo() {
       </div>
       <p className="max-w-md max-xl:max-w-sm">
         <span className="text-base block font-semibold">About the item:</span>
-        Lorem ipsum dolor sit amet consectetur adipisicing elit. Architecto
-        consectetur nostrum adipisci molestias eligendi facilis ratione tenetur
-        doloribus iusto deleniti?
+        {listing?.description}
       </p>
     </Card>
   );
@@ -189,7 +188,7 @@ const Listing = () => {
           <ListingImage listing={listingData} />
           <ListingInfo listing={listingData} />
         </div>
-        <OwnerInfo />
+        <OwnerInfo listing={listingData} />
       </section>
     </section>
   );

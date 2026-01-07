@@ -16,6 +16,7 @@ import { createClient } from "@/lib/supabase/client";
 import { Image as ImageIcon } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
+import { X as CloseIcon } from "lucide-react";
 
 interface Listing {
   category: string[];
@@ -39,10 +40,11 @@ interface ImageSlot {
 
 const EditListing = () => {
   const [listingData, setListingData] = useState<Listing | null>(null);
+  const formRef = useRef<HTMLFormElement | null>(null);
   const [imageSlots, setImageSlots] = useState<ImageSlot[]>(
     Array(6).fill({ type: "empty" })
   );
-  const formRef = useRef<HTMLFormElement | null>(null);
+  const imageSlotsRef = useRef<ImageSlot[]>(imageSlots);
 
   const { id } = useParams<{ id: string }>();
   const supabase = createClient();
@@ -88,14 +90,17 @@ const EditListing = () => {
   }, [id, supabase]);
 
   useEffect(() => {
+    imageSlotsRef.current = imageSlots;
+  }, [imageSlots]);
+
+  useEffect(() => {
     return () => {
-      imageSlots.forEach((slot) => {
+      imageSlotsRef.current.forEach((slot) => {
         if (slot.type === "new" && slot.url) {
           URL.revokeObjectURL(slot.url);
         }
       });
     };
-    // I think I should disable the linter here
   }, []);
 
   function handleImageChange(
@@ -127,50 +132,57 @@ const EditListing = () => {
     });
   }
 
+  async function uploadNewImages() {
+    const uploadedUrls: { [key: number]: string } = {};
+    const newImages = imageSlots
+      .map((slot, idx) => ({ slot, idx }))
+      .filter(({ slot }) => slot.type === "new" && slot.file);
+    for (const { slot, idx } of newImages) {
+      if (!slot.file) continue;
+
+      const fileExt = slot.file.name.split(".").pop();
+      const fileName = `${idx}-${Date.now()}.${fileExt}`;
+      const filePath = `${user?.id}/${listingData?.listing_id}/${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from("listing-images")
+        .upload(filePath, slot.file);
+
+      if (uploadError) {
+        console.error(
+          `Error uploading image while editing: ${uploadError.message}`
+        );
+        alert("Error uploading image");
+        continue;
+      }
+
+      const {
+        data: { publicUrl },
+      } = supabase.storage.from("listing-images").getPublicUrl(filePath);
+
+      uploadedUrls[idx] = publicUrl;
+    }
+
+    const finalImages = imageSlots
+      .map((slot, idx) => {
+        if (uploadedUrls[idx]) return uploadedUrls[idx];
+        if (slot.type === "existing" && slot.url) return slot.url;
+        return null;
+      })
+      .filter(Boolean) as string[];
+
+    return finalImages;
+  }
+
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     if (!listingData) return;
 
-    const newImages = imageSlots
-      .map((slot, idx) => ({ slot, idx }))
-      .filter(({ slot }) => slot.type === "new" && slot.file);
-
     try {
-      const uploadedUrls: { [key: number]: string } = {};
+      const oldImageUrls = await fetchPresentImageUrls(listingData.listing_id);
+      const finalImageUrls = await uploadNewImages();
 
-      for (const { slot, idx } of newImages) {
-        if (!slot.file) continue;
-
-        const fileExt = slot.file.name.split(".").pop();
-        const fileName = `${idx}-${Date.now()}.${fileExt}`;
-        const filePath = `${user?.id}/${listingData.listing_id}/${fileName}`;
-
-        const { error: uploadError } = await supabase.storage
-          .from("listing-images")
-          .upload(filePath, slot.file);
-
-        if (uploadError) {
-          console.error(
-            `Error uploading image while editing: ${uploadError.message}`
-          );
-          alert("Error uploading image");
-          continue;
-        }
-
-        const {
-          data: { publicUrl },
-        } = supabase.storage.from("listing-images").getPublicUrl(filePath);
-
-        uploadedUrls[idx] = publicUrl;
-      }
-
-      const finalImages = imageSlots
-        .map((slot, idx) => {
-          if (uploadedUrls[idx]) return uploadedUrls[idx];
-          if (slot.type === "existing" && slot.url) return slot.url;
-          return null;
-        })
-        .filter(Boolean) as string[];
+      await removeOldImageUrls(oldImageUrls, finalImageUrls);
 
       const { error: updateError } = await supabase
         .from("listings")
@@ -179,18 +191,15 @@ const EditListing = () => {
           description: listingData.description,
           category: listingData.category,
           pickup_location: listingData.pickup_location,
-          images: finalImages,
+          images: finalImageUrls,
           updated_at: new Date().toISOString(),
         })
         .eq("listing_id", id);
 
       if (updateError) {
         console.error(`Error updating listing: ${updateError.message}`);
-        alert("Failed to updated listing");
         return;
       }
-
-      alert("Listing updated successfully!");
 
       formRef.current?.reset();
       router.push(`/listings/${user?.id}`);
@@ -198,15 +207,50 @@ const EditListing = () => {
       setImageSlots(Array(6).fill({ type: "empty" }));
     } catch (error) {
       console.error(`Error updating listing:`, error);
-      alert("An error occurred while updating the listing");
     }
   }
 
-  function handleLocation() {
-    if (navigator.geolocation) {
-      console.log(navigator.geolocation);
+  async function fetchPresentImageUrls(listingId: string): Promise<string[]> {
+    const { data, error } = await supabase
+      .from("listings")
+      .select("images")
+      .eq("listing_id", listingId)
+      .single();
+
+    if (error) {
+      console.error(`Error fetching present image urls: ${error.message}`);
+    }
+    return data?.images ?? [];
+  }
+
+  function getStoragePathFromPublicUrl(publicUrl: string) {
+    const marker = "/listing-images/";
+    const index = publicUrl.indexOf(marker);
+    if (index === -1) return null;
+    return publicUrl.slice(index + marker.length);
+  }
+
+  async function removeOldImageUrls(oldUrls: string[], finalUrls: string[]) {
+    const unusedUrls = oldUrls.filter((url) => !finalUrls.includes(url));
+
+    if (unusedUrls.length === 0) return;
+
+    const pathsToDelete = unusedUrls
+      .map(getStoragePathFromPublicUrl)
+      .filter(Boolean) as string[];
+
+    if (pathsToDelete.length === 0) return;
+
+    const { error } = await supabase.storage
+      .from("listing-images")
+      .remove(pathsToDelete);
+
+    if (error) {
+      console.error(`Error deleting unused images: ${error.message}`);
+      return;
     }
   }
+
   if (!listingData)
     return (
       <p className="max-w-6xl mx-auto max-xl:px-5 text-2xl mt-10">Loading...</p>
@@ -361,14 +405,9 @@ const EditListing = () => {
                   })
                 }
               />
-              <Button
-                type="button"
-                variant="outline"
-                className="max-w-xs"
-                onClick={handleLocation}
-              >
+              {/* <Button type="button" variant="outline" className="max-w-xs">
                 Use my location
-              </Button>
+              </Button> */}
             </Field>
             {/* form submit button  */}
             <Field>
