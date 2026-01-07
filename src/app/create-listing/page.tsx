@@ -14,9 +14,15 @@ import { SelectContent } from "@radix-ui/react-select";
 import { useAuth } from "@/context/AuthContext";
 import { createClient } from "@/lib/supabase/client";
 import { Image as ImageIcon } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { X as CloseIcon } from "lucide-react";
+
+interface Prices {
+  priceDay: number;
+  priceWeek: number | null;
+  priceMonth: number | null;
+}
 
 export function CreateListingForm() {
   const supabase = createClient();
@@ -29,7 +35,6 @@ export function CreateListingForm() {
   const [listingImages, setListingImages] = useState<(File | null)[]>(
     Array(6).fill(null)
   );
-  const imagePreviewsRef = useRef(imagePreviews)
 
   async function uploadListingImages(listingId: string) {
     const uploadedUrls: string[] = [];
@@ -89,6 +94,26 @@ export function CreateListingForm() {
     });
   }
 
+  function toNullableNumber(value: FormDataEntryValue | null) {
+    if (value === null || value === "") return null;
+    const num = Number(value);
+    return Number.isNaN(num) ? null : num;
+  }
+
+  async function insertListingPrices(listingId: string, prices: Prices) {
+    const { error } = await supabase.from("prices").insert({
+      listing_id: listingId,
+      price_day: prices.priceDay,
+      price_week: prices.priceWeek,
+      price_month: prices.priceMonth,
+    });
+
+    if (error) {
+      console.error(`Error inserting prices: ${error.message}`);
+      return;
+    }
+  }
+
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const form = e.currentTarget;
@@ -102,6 +127,15 @@ export function CreateListingForm() {
     const pickup_location = formData.get("pickup-location") as string;
     const user_id = user?.id;
 
+    const priceDay = toNullableNumber(formData.get("price-day"));
+    const priceWeek = toNullableNumber(formData.get("price-week"));
+    const priceMonth = toNullableNumber(formData.get("price-month"));
+
+    if (priceDay === null) {
+      console.error("Price per day is required");
+      return;
+    }
+
     const { data, error: insertError } = await supabase
       .from("listings")
       .insert({ user_id, title, description, category, pickup_location })
@@ -114,6 +148,12 @@ export function CreateListingForm() {
       );
       return;
     }
+
+    await insertListingPrices(data.listing_id, {
+      priceDay,
+      priceMonth,
+      priceWeek,
+    });
 
     const imageUrls = await uploadListingImages(data.listing_id);
 
@@ -139,13 +179,12 @@ export function CreateListingForm() {
     form.reset();
   }
 
-  useEffect(() => {
-    
-  }, [])
-
   function removeImage(idx: number) {
     setImagePreviews((prev) => {
       const updated = [...prev];
+      if (updated[idx]) {
+        URL.revokeObjectURL(updated[idx]);
+      }
       updated[idx] = null;
       return updated;
     });
@@ -210,10 +249,7 @@ export function CreateListingForm() {
                 const hasPreviewImage = imagePreviews[idx];
 
                 return (
-                  <div
-                    key={idx}
-                    className="shadow-sm relative"
-                  >
+                  <div key={idx} className="shadow-sm relative">
                     <Input
                       type="file"
                       accept="image/*"

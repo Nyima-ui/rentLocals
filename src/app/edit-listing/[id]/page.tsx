@@ -30,12 +30,23 @@ interface Listing {
   title: string;
   updated_at: string;
   user_id: string;
+  prices: {
+    price_day: number;
+    price_week: number | null;
+    price_month: number | null;
+  };
 }
 
 interface ImageSlot {
   type: "existing" | "new" | "empty";
   url?: string;
   file?: File;
+}
+export function getStoragePathFromPublicUrl(publicUrl: string) {
+  const marker = "/listing-images/";
+  const index = publicUrl.indexOf(marker);
+  if (index === -1) return null;
+  return publicUrl.slice(index + marker.length);
 }
 
 const EditListing = () => {
@@ -56,7 +67,12 @@ const EditListing = () => {
       if (id) {
         const { data, error } = await supabase
           .from("listings")
-          .select()
+          .select(
+            `*, prices (
+            price_day, 
+            price_week, 
+            price_month)`
+          )
           .eq("listing_id", id)
           .single();
 
@@ -70,6 +86,7 @@ const EditListing = () => {
 
         if (data) {
           setListingData(data);
+          console.log(data);
 
           const initialSlots: ImageSlot[] = Array(6)
             .fill(null)
@@ -174,6 +191,25 @@ const EditListing = () => {
     return finalImages;
   }
 
+  async function updateListingPrices() {
+    const finalPrice = {
+      listing_id: listingData?.listing_id,
+      price_day: listingData?.prices.price_day,
+      price_week: listingData?.prices.price_week,
+      price_month: listingData?.prices.price_month,
+    };
+
+    const { error } = await supabase
+      .from("prices")
+      .update(finalPrice)
+      .eq("listing_id", listingData?.listing_id);
+
+    if (error) {
+      console.error(`Error updating listing price: ${error.message}`);
+      return;
+    }
+  }
+
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     if (!listingData) return;
@@ -195,6 +231,8 @@ const EditListing = () => {
           updated_at: new Date().toISOString(),
         })
         .eq("listing_id", id);
+
+      await updateListingPrices();
 
       if (updateError) {
         console.error(`Error updating listing: ${updateError.message}`);
@@ -223,13 +261,6 @@ const EditListing = () => {
     return data?.images ?? [];
   }
 
-  function getStoragePathFromPublicUrl(publicUrl: string) {
-    const marker = "/listing-images/";
-    const index = publicUrl.indexOf(marker);
-    if (index === -1) return null;
-    return publicUrl.slice(index + marker.length);
-  }
-
   async function removeOldImageUrls(oldUrls: string[], finalUrls: string[]) {
     const unusedUrls = oldUrls.filter((url) => !finalUrls.includes(url));
 
@@ -249,6 +280,32 @@ const EditListing = () => {
       console.error(`Error deleting unused images: ${error.message}`);
       return;
     }
+  }
+
+  function handleRemoveImage(idx: number) {
+    setImageSlots((prev) => {
+      const updated = [...prev];
+      if (updated[idx].type === "new" && updated[idx].url) {
+        URL.revokeObjectURL(updated[idx].url);
+      }
+      updated[idx] = { type: "empty" };
+      return updated;
+    });
+  }
+
+  function handlePriceChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const { name, value } = e.target;
+
+    setListingData((prev) => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        prices: {
+          ...prev.prices,
+          [name]: value === "" ? null : Number(value),
+        },
+      };
+    });
   }
 
   if (!listingData)
@@ -340,7 +397,7 @@ const EditListing = () => {
                   const hasImage = slot.type !== "empty";
 
                   return (
-                    <div key={idx} className="shadow-sm">
+                    <div key={idx} className="shadow-sm relative">
                       <Input
                         type="file"
                         accept="image/*"
@@ -361,6 +418,15 @@ const EditListing = () => {
                           <ImageIcon size={50} className="text-white/70" />
                         )}
                       </label>
+                      {hasImage && (
+                        <button
+                          type="button"
+                          className="absolute top-1.5 right-2 cursor-pointer hover:bg-gray-200/50 transition-all duration-100 ease-in rounded-md"
+                          onClick={() => handleRemoveImage(idx)}
+                        >
+                          <CloseIcon className="text-red-500" size={27} />
+                        </button>
+                      )}
                     </div>
                   );
                 })}
@@ -372,19 +438,38 @@ const EditListing = () => {
               <div className="flex gap-5 max-[400px]:flex-wrap">
                 <Field>
                   <FieldLabel htmlFor="price-1-day">Price for 1 day</FieldLabel>
-                  <Input id="price-1-day" placeholder="$" required />
+                  <Input
+                    id="price-1-day"
+                    placeholder="$"
+                    required
+                    value={listingData?.prices?.price_day ?? ""}
+                    name="price_day"
+                    onChange={handlePriceChange}
+                  />
                 </Field>
                 <Field>
                   <FieldLabel htmlFor="price-1-week">
                     Price for 1 week
                   </FieldLabel>
-                  <Input id="price-1-week" placeholder="$" />
+                  <Input
+                    id="price-1-week"
+                    placeholder="$"
+                    name="price_week"
+                    value={listingData?.prices?.price_week ?? ""}
+                    onChange={handlePriceChange}
+                  />
                 </Field>
                 <Field>
                   <FieldLabel htmlFor="price-1-month">
                     Price for 1 month
                   </FieldLabel>
-                  <Input id="price-1-month" placeholder="$" />
+                  <Input
+                    id="price-1-month"
+                    placeholder="$"
+                    name="price_month"
+                    value={listingData?.prices?.price_month ?? ""}
+                    onChange={handlePriceChange}
+                  />
                 </Field>
               </div>
             </FieldGroup>

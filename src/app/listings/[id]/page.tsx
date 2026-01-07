@@ -21,12 +21,14 @@ import {
   DialogContent,
   DialogFooter,
 } from "@/components/ui/dialog";
+import { getStoragePathFromPublicUrl } from "@/app/edit-listing/[id]/page";
 
 interface MyListingCardProps {
   listing: Listing;
+  onDelete: (listingId: string) => Promise<void>;
 }
 
-export function MyListingCard({ listing }: MyListingCardProps) {
+export function MyListingCard({ listing, onDelete }: MyListingCardProps) {
   const [open, setOpen] = useState(false);
   return (
     <li className="max-w-55">
@@ -44,7 +46,7 @@ export function MyListingCard({ listing }: MyListingCardProps) {
         </CardHeader>
         <CardContent className="px-2">
           <p className="truncate w-full">{listing.title}</p>
-          <p className="font-semibold mt-2">$12/day</p>
+          <p className="font-semibold mt-2 text-lg">{`$${listing?.prices?.price_day}/day`}</p>
         </CardContent>
         <CardFooter className="px-2 flex-col gap-3">
           <div className="flex w-full gap-3">
@@ -73,7 +75,13 @@ export function MyListingCard({ listing }: MyListingCardProps) {
                 <Button variant={"outline"} onClick={() => setOpen(false)}>
                   Cancel
                 </Button>
-                <Button className="bg-red-600/95 hover:bg-red-500">
+                <Button
+                  className="bg-red-600/95 hover:bg-red-500"
+                  onClick={async () => {
+                    await onDelete(listing.listing_id);
+                    setOpen(false);
+                  }}
+                >
                   Delete
                 </Button>
               </DialogFooter>
@@ -97,6 +105,11 @@ interface Listing {
   title: string;
   updated_at: string;
   user_id: string;
+  prices: {
+    price_day: number;
+    price_week: number | null;
+    price_month: number | null;
+  };
 }
 
 const Listings = () => {
@@ -109,7 +122,13 @@ const Listings = () => {
       if (!user) return;
       const { data, error } = await supabase
         .from("listings")
-        .select()
+        .select(
+          `*, prices (
+            price_day, 
+            price_week, 
+            price_month
+          )`
+        )
         .eq("user_id", user?.id);
 
       if (error) {
@@ -123,12 +142,49 @@ const Listings = () => {
 
     fetchUserListings();
   }, [user, supabase]);
+
+  async function handleDeleteListing(listingId: string) {
+    const { data, error: deleteError } = await supabase
+      .from("listings")
+      .delete()
+      .eq("listing_id", listingId)
+      .select("images")
+      .single();
+
+    if (deleteError) {
+      console.error(`Error deleting a listing: ${deleteError.message}`);
+      return;
+    }
+
+    const storagePathsToDelete: string[] = (data.images ?? [])
+      .map(getStoragePathFromPublicUrl)
+      .filter((path: string | null): path is string => path !== null);
+
+    const { error } = await supabase.storage
+      .from("listing-images")
+      .remove(storagePathsToDelete);
+
+    if (error) {
+      console.error(
+        `Error deleting images while deleting listing: ${error.message}`
+      );
+      return;
+    }
+
+    setListings((prev) =>
+      prev.filter((listing) => listing.listing_id !== listingId)
+    );
+  }
   return (
     <section className="max-w-6xl mx-auto  mb-15">
       <h1 className="text-3xl max-xl:px-5">Your listings</h1>
       <ul className="grid mt-7 grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-3 max-xl:px-5">
         {listings.map((item, index) => (
-          <MyListingCard key={index} listing={item} />
+          <MyListingCard
+            key={index}
+            listing={item}
+            onDelete={handleDeleteListing}
+          />
         ))}
       </ul>
     </section>

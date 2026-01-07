@@ -12,6 +12,7 @@ import { createClient } from "@/lib/supabase/client";
 
 interface ListingSectionProps {
   listing: Listing;
+  prices?: IncomingPrices | null;
 }
 
 export function ListingImage({ listing }: ListingSectionProps) {
@@ -24,9 +25,7 @@ export function ListingImage({ listing }: ListingSectionProps) {
       <div className="bg-gray-400 h-100 w-full relative">
         <Image
           fill
-          preload={true}
           loading="eager"
-          fetchPriority="high"
           sizes="(max-width: 768px) 100vw, 60vw"
           alt={listing?.title}
           src={imageDisplayed}
@@ -38,11 +37,9 @@ export function ListingImage({ listing }: ListingSectionProps) {
           <li key={idx} className="size-12.5 relative">
             <Image
               fill
-              preload={true}
-              loading="eager"
               src={img}
+              loading="eager"
               alt="thumbnail"
-              fetchPriority="high"
               className="object-cover"
               sizes="(max-width: 768px) 100vw, 60vw"
               onClick={() => setImageDisplayed(img)}
@@ -54,7 +51,7 @@ export function ListingImage({ listing }: ListingSectionProps) {
   );
 }
 
-export function ListingInfo({ listing }: ListingSectionProps) {
+export function ListingInfo({ listing, prices }: ListingSectionProps) {
   return (
     <div className="grow space-y-3 w-1/2 max-md:w-full">
       <h1 className="text-4xl font-medium leading-tighter">{listing?.title}</h1>
@@ -81,15 +78,19 @@ export function ListingInfo({ listing }: ListingSectionProps) {
         <p className="text-lg">Price for all periods:</p>
         <div className="flex gap-5 mt-3">
           <div className="border grow text-center rounded-md py-1.5">
-            <p className="text-xl font-medium">$27</p>
+            <p className="text-xl font-medium">{`$${prices?.price_day}`}</p>
             <p className="text-gray-500">/day</p>
           </div>
           <div className="border grow text-center rounded-md py-1.5">
-            <p className="text-xl font-medium">$72</p>
+            <p className="text-xl font-medium">
+              {prices?.price_week ? `$${prices.price_week}` : `Not set`}
+            </p>
             <p className="text-gray-500">/week</p>
           </div>
           <div className="border grow text-center rounded-md py-1.5">
-            <p className="text-xl font-medium">$365</p>
+            <p className="text-xl font-medium">
+              {prices?.price_month ? `$${prices.price_month}` : `Not set`}
+            </p>
             <p className="text-gray-500">/month</p>
           </div>
         </div>
@@ -149,9 +150,18 @@ interface Listing {
   updated_at: string;
   user_id: string;
 }
+interface IncomingPrices {
+  listing_id: string;
+  price_day: number;
+  price_week: number | null;
+  price_month: number | null;
+}
 
 const Listing = () => {
   const [listingData, setListingData] = useState<Listing | null>(null);
+  const [listingPrices, setListingPrices] = useState<IncomingPrices | null>(
+    null
+  );
   const { id } = useParams();
   const supabase = createClient();
 
@@ -164,15 +174,30 @@ const Listing = () => {
         .single();
 
       if (error) {
-        console.error(
-          `Error fetching data in single listing page: ${error.message}`
-        );
-        alert("Error fetching data in single listing page.");
+        console.error(`Error fetching a listing: ${error.message}`);
+        return;
       }
 
       if (data) setListingData(data);
     }
     fetchListing();
+
+    async function fetchPrices() {
+      const { data, error: fetchPriceError } = await supabase
+        .from("prices")
+        .select()
+        .eq("listing_id", id)
+        .single();
+
+      if (fetchPriceError) {
+        console.error(
+          `Error fetching price of a listing: ${fetchPriceError.message}`
+        );
+        return;
+      }
+      if (data) setListingPrices(data);
+    }
+    fetchPrices();
   }, [id, supabase]);
 
   if (!listingData)
@@ -186,7 +211,7 @@ const Listing = () => {
       <section className="max-w-6xl mx-auto my-10  max-xl:px-5">
         <div className="flex gap-5 max-md:flex-col justify-between">
           <ListingImage listing={listingData} />
-          <ListingInfo listing={listingData} />
+          <ListingInfo listing={listingData} prices={listingPrices} />
         </div>
         <OwnerInfo listing={listingData} />
       </section>
