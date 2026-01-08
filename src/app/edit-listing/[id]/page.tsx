@@ -86,7 +86,6 @@ const EditListing = () => {
 
         if (data) {
           setListingData(data);
-          console.log(data);
 
           const initialSlots: ImageSlot[] = Array(6)
             .fill(null)
@@ -154,6 +153,7 @@ const EditListing = () => {
     const newImages = imageSlots
       .map((slot, idx) => ({ slot, idx }))
       .filter(({ slot }) => slot.type === "new" && slot.file);
+
     for (const { slot, idx } of newImages) {
       if (!slot.file) continue;
 
@@ -165,13 +165,10 @@ const EditListing = () => {
         .from("listing-images")
         .upload(filePath, slot.file);
 
-      if (uploadError) {
-        console.error(
+      if (uploadError)
+        throw new Error(
           `Error uploading image while editing: ${uploadError.message}`
         );
-        alert("Error uploading image");
-        continue;
-      }
 
       const {
         data: { publicUrl },
@@ -205,8 +202,7 @@ const EditListing = () => {
       .eq("listing_id", listingData?.listing_id);
 
     if (error) {
-      console.error(`Error updating listing price: ${error.message}`);
-      return;
+      throw new Error(`Failed to update prices: ${error.message}`);
     }
   }
 
@@ -217,7 +213,6 @@ const EditListing = () => {
     try {
       const oldImageUrls = await fetchPresentImageUrls(listingData.listing_id);
       const finalImageUrls = await uploadNewImages();
-
       await removeOldImageUrls(oldImageUrls, finalImageUrls);
 
       const { error: updateError } = await supabase
@@ -232,12 +227,10 @@ const EditListing = () => {
         })
         .eq("listing_id", id);
 
-      await updateListingPrices();
+      if (updateError)
+        throw new Error(`Error updating listing: ${updateError.message}`);
 
-      if (updateError) {
-        console.error(`Error updating listing: ${updateError.message}`);
-        return;
-      }
+      await updateListingPrices();
 
       formRef.current?.reset();
       router.push(`/listings/${user?.id}`);
@@ -245,6 +238,10 @@ const EditListing = () => {
       setImageSlots(Array(6).fill({ type: "empty" }));
     } catch (error) {
       console.error(`Error updating listing:`, error);
+      alert(
+        error instanceof Error ? error.message : "An unknown error occured"
+      );
+      return;
     }
   }
 
@@ -255,9 +252,9 @@ const EditListing = () => {
       .eq("listing_id", listingId)
       .single();
 
-    if (error) {
-      console.error(`Error fetching present image urls: ${error.message}`);
-    }
+    if (error)
+      throw new Error(`Error fetching present image urls: ${error.message}`);
+
     return data?.images ?? [];
   }
 
@@ -276,10 +273,8 @@ const EditListing = () => {
       .from("listing-images")
       .remove(pathsToDelete);
 
-    if (error) {
-      console.error(`Error deleting unused images: ${error.message}`);
-      return;
-    }
+    if (error)
+      throw new Error(`Error deleting unused images: ${error.message}`);
   }
 
   function handleRemoveImage(idx: number) {

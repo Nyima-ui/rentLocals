@@ -1,24 +1,25 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { SearchIcon } from "lucide-react";
+import Link from "next/link";
+import { ImageIcon } from "lucide-react";
+import { Avatar, AvatarImage } from "@radix-ui/react-avatar";
+import { useEffect, useState } from "react";
+import { createClient } from "@/lib/supabase/client";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/context/AuthContext";
+import Image from "next/image";
 import {
   InputGroup,
   InputGroupAddon,
   InputGroupInput,
 } from "@/components/ui/input-group";
-import Link from "next/link";
-import { ImageIcon } from "lucide-react";
 import {
   Card,
   CardContent,
   CardFooter,
   CardHeader,
 } from "@/components/ui/card";
-import { Avatar, AvatarImage } from "@radix-ui/react-avatar";
-import { useState } from "react";
-import { createClient } from "@/lib/supabase/client";
-import { useRouter } from "next/navigation";
-import { useAuth } from "@/context/AuthContext";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -105,22 +106,31 @@ export function SearchBox() {
   );
 }
 
-export function ListingCard() {
+interface ListingCardProps {
+  listing: Listing;
+}
+
+export function ListingCard({ listing }: ListingCardProps) {
   return (
     <li>
-      <Link href="/listing/234fsdf">
+      <Link href={`/listing/${listing.listing_id}`}>
         <Card className="p-0 overflow-hidden gap-2 pb-3">
           <CardHeader className="p-0 ">
-            <div className="bg-gray-400 h-43.75">
-              <ImageIcon className="text-gray-200" />
+            <div className="bg-gray-400 h-43.75 relative">
+              <Image
+                src={listing?.images?.[0]}
+                alt={listing?.title}
+                fill
+                loading="eager"
+                sizes="(max-width: 768px) 100vw, 60vw"
+                className="object-cover"
+              />
             </div>
           </CardHeader>
           <CardContent className="p-0">
             <CardFooter className="flex flex-col items-start px-1.5">
-              <p className="truncate w-full">
-                Xp-pen innovator display 16 drawing tablet (15.6)
-              </p>
-              <p>$12/day</p>
+              <p className="truncate w-full">{listing.title}</p>
+              <p className="font-medium">{`$${listing.prices.price_day}/day`}</p>
             </CardFooter>
           </CardContent>
         </Card>
@@ -129,13 +139,49 @@ export function ListingCard() {
   );
 }
 
+interface Listing {
+  category: string[];
+  created_at: string;
+  description: string;
+  images: string[];
+  is_active: boolean;
+  is_featured: boolean;
+  listing_id: string;
+  pickup_location: string;
+  title: string;
+  updated_at: string;
+  user_id: string;
+  prices: {
+    price_day: number;
+    price_week: number | null;
+    price_month: number | null;
+  };
+}
+
 export default function Home() {
+  const [listings, setListings] = useState<Listing[]>([]);
+  const supabase = createClient();
+
+  useEffect(() => {
+    async function fetchListingsForHome() {
+      const { data, error } = await supabase
+        .from("listings")
+        .select("*, prices (price_day)");
+
+      if (error) {
+        console.error(`Error fetching listing at /: ${error.message}`);
+        return;
+      }
+      setListings(data);
+    }
+    fetchListingsForHome();
+  }, [supabase]);
   return (
     <section className="max-w-6xl mx-auto mb-15">
       <SearchBox />
       <ul className="grid mt-10 grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-3 max-xl:px-5">
-        {Array.from({ length: 20 }).map((_, index) => (
-          <ListingCard key={index} />
+        {listings.map((listing, index) => (
+          <ListingCard key={index} listing={listing} />
         ))}
       </ul>
     </section>

@@ -6,9 +6,16 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardAction, CardContent, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarImage } from "@radix-ui/react-avatar";
-import Link from "next/link";
 import { useParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import {
+  Field,
+  FieldDescription,
+  FieldGroup,
+  FieldLabel,
+  FieldTitle,
+} from "@/components/ui/field";
+import { useAuth } from "@/context/AuthContext";
 
 interface ListingSectionProps {
   listing: Listing;
@@ -51,31 +58,90 @@ export function ListingImage({ listing }: ListingSectionProps) {
   );
 }
 
+// const startDate = new Date(startDateStr).toISOString();
+// const endDate = new Date(endDateStr).toISOString();
+
+interface Booking {
+  listing_id: string;
+  owner_id: string;
+  renter_id: string;
+  start_date: string;
+  end_date: string;
+  status: "requested" | "booked" | "declined" | "cancelled";
+  price_per_day: string;
+  total_price: string;
+}
+
 export function ListingInfo({ listing, prices }: ListingSectionProps) {
+  const supabase = createClient();
+  const { user } = useAuth();
+  console.log(user);
+
+  function calculateTotalPrice(){
+    
+  }
+
+  async function requestBooking(e: React.FormEvent<HTMLFormElement>) {
+    //should i wrap this in try catch?
+    e.preventDefault();
+    const form = e.currentTarget;
+    const formData = new FormData(form);
+
+    const startDate = new Date(
+      formData.get("start-date") as string
+    ).toISOString();
+    const endDate = new Date(formData.get("end-date") as string).toISOString();
+    const listing_id = listing.listing_id;
+    const owner_id = listing.user_id;
+    const renter_id = user?.id;
+    const status = 'requested'; 
+    const price_per_day = prices?.price_day
+
+    // const { error} = await supabase.from("bookings")
+  }
   return (
     <div className="grow space-y-3 w-1/2 max-md:w-full">
       <h1 className="text-4xl font-medium leading-tighter">{listing?.title}</h1>
-      <div className="flex items-center justify-between max-w-xs mt-10 ">
-        <label htmlFor="start-date" className="text-nowrap">
-          Start date:
-        </label>
-        <Input type="date" id="start-date" className="max-w-50" />
-      </div>
-      <div className="flex items-center justify-between max-w-xs">
-        <label htmlFor="end-date" className="text-nowrap">
-          End date:
-        </label>
-        <Input type="date" id="end-date" className="max-w-50" />
-      </div>
+      <form onSubmit={requestBooking}>
+        <FieldGroup className="flex-row">
+          <Field>
+            <FieldLabel htmlFor="start-date" className="text-nowrap">
+              Start date:
+            </FieldLabel>
+            <Input
+              type="date"
+              id="start-date"
+              name="start-date"
+              required
+              className="max-w-50 cursor-pointer"
+            />
+          </Field>
+          <Field>
+            <FieldLabel htmlFor="end-date" className="text-nowrap">
+              End date:
+            </FieldLabel>
+            <Input
+              type="date"
+              id="end-date"
+              name="end-date"
+              required
+              className="max-w-50 cursor-pointer"
+            />
+          </Field>
+        </FieldGroup>
+        <div className="mt-10">
+          <FieldTitle className="text-2xl">{`$${prices?.price_day}`}</FieldTitle>
+          <FieldDescription className="text-gray-500">
+            Price for 1 day
+          </FieldDescription>
+        </div>
+        {/* disable button if owner is requesting to their own listing  */}
+        <Button className="mt-5 cursor-pointer" type="submit">
+          Request Booking
+        </Button>
+      </form>
       <div className="mt-10">
-        <h2 className="text-2xl font-medium opacity-80">$27.50</h2>
-        <p className="text-gray-500">Price for 1 day</p>
-      </div>
-      <Button className="mt-5" asChild>
-        <Link href="/chat">Request Booking</Link>
-      </Button>
-      <div className="mt-10">
-        <p className="text-lg">Price for all periods:</p>
+        <p className="text-lg">Price for all periods</p>
         <div className="flex gap-5 mt-3">
           <div className="border grow text-center rounded-md py-1.5">
             <p className="text-xl font-medium">{`$${prices?.price_day}`}</p>
@@ -99,20 +165,51 @@ export function ListingInfo({ listing, prices }: ListingSectionProps) {
   );
 }
 
+interface UserData {
+  avatar: string;
+  first_name: string;
+  last_name: string;
+}
+
 export function OwnerInfo({ listing }: ListingSectionProps) {
+  const [ownerData, setOwnerData] = useState<UserData | null>(null);
+  const ownerId = listing.user_id;
+  const supabase = createClient();
+
+  useEffect(() => {
+    async function fetchOwner() {
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("avatar, first_name, last_name")
+        .eq("user_id", ownerId)
+        .single();
+
+      if (error) {
+        console.error(`Error fetching owner data: ${error.message}`);
+        return;
+      }
+      setOwnerData(data);
+    }
+    fetchOwner();
+  }, [ownerId, supabase]);
+
+  const ownerName = ownerData
+    ? `${ownerData?.first_name ?? ""} ${ownerData?.last_name ?? ""}`
+    : "Unknown";
+
   return (
     <Card className="flex flex-row items-start max-lg:flex-col mt-10 justify-between bg-transparent border-none shadow-none">
       <div className="flex items-start max-md:flex-col max-md:gap-5">
         <div className="flex items-center">
           <Avatar>
             <AvatarImage
-              src="https://github.com/shadcn.png"
+              src={ownerData?.avatar}
               alt="@shadcn"
-              className="size-15 rounded-[100px]"
+              className="size-15 rounded-[100px] object-cover"
             />
           </Avatar>
           <CardContent>
-            <CardTitle className="text-lg">Owned by Shan R</CardTitle>
+            <CardTitle className="text-lg">Owned by {ownerName}</CardTitle>
             <CardAction className="mt-3">
               <Button>Message</Button>
             </CardAction>

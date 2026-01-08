@@ -175,6 +175,14 @@ const Listings = () => {
       prev.filter((listing) => listing.listing_id !== listingId)
     );
   }
+  if (listings.length === 0) {
+    return (
+      <div className="max-w-6xl mx-auto  mb-15">
+        <h1 className="text-2xl my-7">No listings yet</h1>
+        <Button asChild><Link href="/create-listing">Create listing</Link></Button>
+      </div>
+    );
+  }
   return (
     <section className="max-w-6xl mx-auto  mb-15">
       <h1 className="text-3xl max-xl:px-5">Your listings</h1>
