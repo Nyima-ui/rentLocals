@@ -8,6 +8,8 @@ import { Card, CardAction, CardContent, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarImage } from "@radix-ui/react-avatar";
 import { useParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { useAuth } from "@/context/AuthContext";
+import { useRouter } from "next/navigation";
 import {
   Field,
   FieldDescription,
@@ -15,7 +17,6 @@ import {
   FieldLabel,
   FieldTitle,
 } from "@/components/ui/field";
-import { useAuth } from "@/context/AuthContext";
 
 interface ListingSectionProps {
   listing: Listing;
@@ -58,9 +59,6 @@ export function ListingImage({ listing }: ListingSectionProps) {
   );
 }
 
-// const startDate = new Date(startDateStr).toISOString();
-// const endDate = new Date(endDateStr).toISOString();
-
 interface Booking {
   listing_id: string;
   owner_id: string;
@@ -68,36 +66,86 @@ interface Booking {
   start_date: string;
   end_date: string;
   status: "requested" | "booked" | "declined" | "cancelled";
-  price_per_day: string;
-  total_price: string;
+  price_per_day: number;
+  total_price: number;
 }
 
 export function ListingInfo({ listing, prices }: ListingSectionProps) {
   const supabase = createClient();
   const { user } = useAuth();
-  console.log(user);
+  const router = useRouter();
+  const isOwnerOfTheListing = listing.user_id === user?.id;
 
-  function calculateTotalPrice(){
-    
+  function calculateTotalPrice(
+    startDate: string,
+    endDate: string,
+    pricePerDay: number
+  ) {
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+
+    const diffMs = end.getTime() - start.getTime();
+    if (diffMs <= 0) return 0;
+
+    const MS_PER_DAY = 1000 * 60 * 60 * 24;
+    const days = diffMs / MS_PER_DAY + 1;
+
+    return days * pricePerDay;
   }
 
   async function requestBooking(e: React.FormEvent<HTMLFormElement>) {
-    //should i wrap this in try catch?
-    e.preventDefault();
-    const form = e.currentTarget;
-    const formData = new FormData(form);
+    try {
+      if (!user) throw new Error("User not authenticated");
+      e.preventDefault();
+      const form = e.currentTarget;
+      const formData = new FormData(form);
+      //below two dates are calculating the prices
+      const startDateStr = formData.get("start-date") as string;
+      const endDateStr = formData.get("end-date") as string;
+      const listing_id = listing.listing_id;
+      const owner_id = listing.user_id;
+      const renter_id = user.id;
+      const status = "requested";
+      const price_per_day = prices?.price_day || 0;
+      const total_price = calculateTotalPrice(
+        startDateStr,
+        endDateStr,
+        price_per_day
+      );
+      //below two dates are what we are storing in db
+      const startDate = new Date(
+        formData.get("start-date") as string
+      ).toISOString();
+      const endDate = new Date(
+        formData.get("end-date") as string
+      ).toISOString();
 
-    const startDate = new Date(
-      formData.get("start-date") as string
-    ).toISOString();
-    const endDate = new Date(formData.get("end-date") as string).toISOString();
-    const listing_id = listing.listing_id;
-    const owner_id = listing.user_id;
-    const renter_id = user?.id;
-    const status = 'requested'; 
-    const price_per_day = prices?.price_day
+      const bookingDetails: Booking = {
+        listing_id,
+        owner_id,
+        renter_id,
+        start_date: startDate,
+        end_date: endDate,
+        status,
+        price_per_day,
+        total_price,
+      };
+      const { data, error } = await supabase
+        .from("bookings")
+        .insert(bookingDetails)
+        .select()
+        .single();
 
-    // const { error} = await supabase.from("bookings")
+      if (error) {
+        console.log(
+          `Supabase error inserting booking details: ${error.message}`
+        );
+        return;
+      }
+      router.push(`/booking/${data.booking_id}`);
+    } catch (error) {
+      console.error(`Request booking failed: ${error}`);
+    }
   }
   return (
     <div className="grow space-y-3 w-1/2 max-md:w-full">
@@ -135,8 +183,11 @@ export function ListingInfo({ listing, prices }: ListingSectionProps) {
             Price for 1 day
           </FieldDescription>
         </div>
-        {/* disable button if owner is requesting to their own listing  */}
-        <Button className="mt-5 cursor-pointer" type="submit">
+        <Button
+          className="mt-5 cursor-pointer"
+          type="submit"
+          disabled={isOwnerOfTheListing}
+        >
           Request Booking
         </Button>
       </form>

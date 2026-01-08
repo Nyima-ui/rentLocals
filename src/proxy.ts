@@ -33,7 +33,7 @@ export async function proxy(request: NextRequest) {
 
   const isProtectedRoute =
     pathname.startsWith("/listings") ||
-    pathname.startsWith("/chat") ||
+    pathname.startsWith("/booking") ||
     pathname.startsWith("/create-listing") ||
     pathname.startsWith("/edit-listing");
 

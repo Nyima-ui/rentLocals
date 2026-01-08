@@ -1,6 +1,6 @@
 "use client";
 import { Avatar, AvatarImage } from "@radix-ui/react-avatar";
-import { SearchBox } from "../page";
+import { SearchBox } from "../../page";
 import {
   Card,
   CardAction,
@@ -147,16 +147,40 @@ export function OwnerBookingInfo() {
   );
 }
 
+export function AutomaticMessage() {
+  return (
+    <div className="bg-cyan-100 max-w-60 ml-3 my-5 px-2 py-1.5 border-l-2 border-cyan-300 text-sm">
+      <p>Date: 1st Jan, 2026</p>
+      <p>You request has been sent.</p>
+    </div>
+  );
+}
+
+export function ChatMessage() {
+  return (
+    <div className="flex gap-3">
+      <div>
+        <Avatar>
+          <AvatarImage
+            src="https://github.com/shadcn.png"
+            className="size-12 rounded-[100px]"
+          />
+        </Avatar>
+      </div>
+      <div className="text-sm bg-gray-600 text-white max-w-70 rounded-b-lg px-2 py-1 rounded-tr-lg mt-7">
+        Lorem ipsum dolor sit amet, consectetur adipisicing elit. Nemo, quam!
+      </div>
+    </div>
+  );
+}
+
 export function Chat() {
   return (
-    <div className="grow px-3 h-135  relative border rounded-md min-w-109.25 pt-3">
-      <div className="h-105 overflow-y-scroll no-scrollbar pb-10">
-        <div className="bg-cyan-100 max-w-60 ml-3 my-5 px-2 py-1.5 border-l-2 border-cyan-300 text-sm">
-          <p>Date: 1st Jan, 2026</p>
-          <p>You request has been sent.</p>
-        </div>
+    <div className="grow px-3 h-135  relative border rounded-md min-w-109.25 pt-3 border-red-500">
+      <div className="h-105 overflow-y-scroll no-scrollbar pb-10 border border-red-400">
+        <AutomaticMessage />
 
-        <div className="flex gap-3">
+        <div className="flex gap-3 border border-red-800">
           <div>
             <Avatar>
               <AvatarImage
@@ -170,7 +194,10 @@ export function Chat() {
             quam!
           </div>
         </div>
-        <div className="flex gap-3 mt-5 justify-end">
+
+
+
+        <div className="flex gap-3 mt-5 justify-end border border-red-500!">
           <div className="text-sm bg-gray-600 text-white max-w-70 rounded-b-lg px-2 py-1 rounded-tl-lg mt-7">
             Lorem ipsum dolor sit amet, consectetur adipisicing elit. Nemo,
             quam!
@@ -184,6 +211,9 @@ export function Chat() {
             </Avatar>
           </div>
         </div>
+
+
+
 
         <div className="flex gap-3 mt-5">
           <div>
@@ -214,13 +244,12 @@ export function Chat() {
 }
 
 const ChatPage = () => {
-  const [isRenter, setisRenter] = useState<boolean>(false);
   return (
     <section className="max-w-6xl mx-auto max-xl:px-5 mb-15">
       <SearchBox />
       <div className="mt-17 flex justify-between max-md:flex-col gap-5">
-        {/* <RenterBookingInfo /> */}
-        <OwnerBookingInfo />
+        <RenterBookingInfo />
+        {/* <OwnerBookingInfo /> */}
         <Chat />
       </div>
     </section>
