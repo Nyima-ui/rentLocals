@@ -70,11 +70,30 @@ interface Booking {
   total_price: number;
 }
 
+
 export function ListingInfo({ listing, prices }: ListingSectionProps) {
   const supabase = createClient();
   const { user } = useAuth();
   const router = useRouter();
   const isOwnerOfTheListing = listing.user_id === user?.id;
+
+  async function preventDoubleBooking(
+    listingId: string,
+    renterId: string,
+    ownerId: string
+  ) {
+    const { data, error } = await supabase
+      .from("bookings")
+      .select()
+      .eq("listing_id", listingId)
+      .eq("renter_id", renterId)
+      .eq("owner_id", ownerId)
+      .in("status", ["requested", "booked"])
+      .limit(1)
+      .maybeSingle();
+    if (error) throw new Error(`Error fetching existing bookings.`);
+    return data;
+  }
 
   function calculateTotalPrice(
     startDate: string,
@@ -120,6 +139,17 @@ export function ListingInfo({ listing, prices }: ListingSectionProps) {
         formData.get("end-date") as string
       ).toISOString();
 
+      const existingBooking = await preventDoubleBooking(
+        listing_id,
+        renter_id,
+        owner_id
+      );
+
+      if (existingBooking) {
+        router.push(`/booking/${existingBooking.booking_id}`);
+        return;
+      }
+
       const bookingDetails: Booking = {
         listing_id,
         owner_id,
@@ -137,7 +167,7 @@ export function ListingInfo({ listing, prices }: ListingSectionProps) {
         .single();
 
       if (error) {
-        console.log(
+        console.error(
           `Supabase error inserting booking details: ${error.message}`
         );
         return;
