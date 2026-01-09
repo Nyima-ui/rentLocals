@@ -154,6 +154,11 @@ interface IncomingBooking extends Booking {
   listings: {
     title: string;
   };
+  owner: {
+    avatar: string;
+    first_name: string;
+    last_name: string;
+  };
 }
 
 interface ChatProps {
@@ -184,6 +189,13 @@ function formatSystemDate(isoString: string) {
   const year = date.getFullYear();
 
   return `Date: ${day}${suffix} ${month}, ${year}`;
+}
+
+function formatStartEndDate(isoString: string) {
+  const date = new Date(isoString);
+  const day = date.getDate();
+  const month = date.toLocaleString("en-US", { month: "short" });
+  return `${day} ${month}`;
 }
 
 export function Chat({ booking }: ChatProps) {
@@ -244,19 +256,21 @@ export function RenterBookingInfo({ booking }: RenterBookingInfoProps) {
           </Link>
         </CardTitle>
         <div className="flex items-center gap-2 mt-7">
-          <Avatar>
-            <AvatarImage
-              src="https://github.com/shadcn.png"
-              className="size-12 rounded-[100px]"
-            />
+          <Avatar className="size-13! rounded-full overflow-hidden">
+            <AvatarImage src={booking.owner.avatar} className="object-cover" />
           </Avatar>
-
-          <Link href="#">Artur S</Link>
+          <CardDescription className="text-black text-lg">
+            {booking.owner.first_name} {booking.owner.last_name}
+          </CardDescription>
         </div>
         {/* rental period */}
         <div className="mt-7">
           <div className="border grow text-center rounded-md py-1.5">
-            <p className="text-xl font-medium">2 Jan - 27 Jan</p>
+            <p className="text-xl font-medium">
+              {formatStartEndDate(booking.start_date)}-
+              {formatStartEndDate(booking.end_date)} /{" "}
+              {new Date(booking.end_date).getFullYear()}
+            </p>
             <CardDescription className="text-gray-500">
               Rental period
             </CardDescription>
@@ -264,13 +278,13 @@ export function RenterBookingInfo({ booking }: RenterBookingInfoProps) {
         </div>
         <div className="flex gap-10 mt-5">
           <div className="border grow text-center rounded-md py-1.5">
-            <p className="text-xl font-medium">$27</p>
+            <p className="text-xl font-medium">${booking.price_per_day}</p>
             <CardDescription className="text-gray-500">
               Price per day
             </CardDescription>
           </div>
           <div className="border grow text-center rounded-md py-1.5">
-            <p className="text-xl font-medium">$270</p>
+            <p className="text-xl font-medium">${booking.total_price}</p>
             <CardDescription className="text-gray-500">
               Total amount
             </CardDescription>
@@ -301,7 +315,7 @@ const ChatPage = () => {
       const { data, error } = await supabase
         .from("bookings")
         .select(
-          "*, listings (title), owner:profiles!bookings_owner_id_fkey (avatar, first_name, last_name)"
+          "*, listings (title), owner:profiles!bookings_owner_id_fkey1 (avatar, first_name, last_name)"
         )
         .eq("booking_id", id)
         .single();
@@ -313,7 +327,7 @@ const ChatPage = () => {
         return;
       }
       setCurrentBooking(data);
-      console.log(data);
+      // console.log(data);
     }
     fetchBookingDetails();
   }, [id, supabase]);
