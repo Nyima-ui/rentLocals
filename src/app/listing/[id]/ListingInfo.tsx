@@ -7,12 +7,39 @@ import {
   FieldTitle,
   FieldDescription,
 } from "@/components/ui/field";
+import { Listing, IncomingPrices } from "./types";
+import { useAuth } from "@/context/AuthContext";
+import { useRouter } from "next/navigation";
+import { requestBookingAction } from "./actions";
 
-export function ListingInfo({ listing, prices }: ListingSectionProps) {
-  const supabase = createClient();
+export function ListingInfo({
+  listing,
+  prices,
+}: {
+  listing: Listing;
+  prices: IncomingPrices | null;
+}) {
   const { user } = useAuth();
   const router = useRouter();
   const isOwnerOfTheListing = listing.user_id === user?.id;
+
+  async function requestBooking(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    if (!user || !prices) return;
+
+    const formData = new FormData(e.currentTarget);
+
+    const result = await requestBookingAction({
+      listingId: listing.listing_id,
+      ownerId: listing.user_id,
+      renterId: user.id,
+      start: formData.get("start-date") as string,
+      end: formData.get("end-date") as string,
+      pricePerDay: prices.price_day,
+    });
+
+    router.push(`/booking/${result.bookingId}`);
+  }
 
   return (
     <div className="grow space-y-3 w-1/2 max-md:w-full">

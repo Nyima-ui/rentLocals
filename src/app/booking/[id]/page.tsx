@@ -327,7 +327,6 @@ const ChatPage = () => {
         return;
       }
       setCurrentBooking(data);
-      // console.log(data);
     }
     fetchBookingDetails();
   }, [id, supabase]);
@@ -341,8 +340,8 @@ const ChatPage = () => {
     <section className="max-w-6xl mx-auto max-xl:px-5 mb-15">
       <SearchBox />
       <div className="mt-17 flex justify-between max-md:flex-col gap-5">
-        <RenterBookingInfo booking={currentBooking} />
-        {/* <OwnerBookingInfo /> */}
+        {/* <RenterBookingInfo booking={currentBooking} /> */}
+        <OwnerBookingInfo />
         <Chat booking={currentBooking} />
       </div>
     </section>

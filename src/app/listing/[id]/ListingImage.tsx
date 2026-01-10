@@ -1,10 +1,11 @@
+"use client";
 import Image from "next/image";
+import { useState } from "react";
+import { Listing } from "./types";
 
-export function ListingImage({ listing }: ListingSectionProps) {
-  const [imageDisplayed, setImageDisplayed] = useState<string>(
-    listing?.images[0]
-  );
-  const { images } = listing;
+export function ListingImage({ listing }: { listing: Listing }) {
+  const [image, setImage] = useState(listing?.images[0]);
+
   return (
     <div className="w-[60%] max-md:w-full">
       <div className="bg-gray-400 h-100 w-full relative">
@@ -13,12 +14,12 @@ export function ListingImage({ listing }: ListingSectionProps) {
           loading="eager"
           sizes="(max-width: 768px) 100vw, 60vw"
           alt={listing?.title}
-          src={imageDisplayed}
+          src={image}
           className="object-cover"
         />
       </div>
       <ul className="flex mt-2 gap-2 justify-end">
-        {images.map((img, idx) => (
+        {listing.images.map((img, idx) => (
           <li key={idx} className="size-12.5 relative">
             <Image
               fill
@@ -27,7 +28,7 @@ export function ListingImage({ listing }: ListingSectionProps) {
               alt="thumbnail"
               className="object-cover"
               sizes="(max-width: 768px) 100vw, 60vw"
-              onClick={() => setImageDisplayed(img)}
+              onClick={() => setImage(img)}
             />
           </li>
         ))}
@@ -35,7 +36,4 @@ export function ListingImage({ listing }: ListingSectionProps) {
     </div>
   );
 }
-export default ListingImage
-
-
-
+export default ListingImage;

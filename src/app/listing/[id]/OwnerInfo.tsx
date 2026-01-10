@@ -1,34 +1,19 @@
+"use client";
 import { Card, CardTitle, CardAction, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage } from "@radix-ui/react-avatar";
+import { OwnerProfile, Listing } from "./types";
+import { getOwnerProfile } from "./hooks";
+import { useEffect, useState } from "react";
 
-
-
-export function OwnerInfo({ listing }: ListingSectionProps) {
-  const [ownerData, setOwnerData] = useState<UserData | null>(null);
-  const ownerId = listing.user_id;
-  const supabase = createClient();
+export function OwnerInfo({ listing }: { listing: Listing }) {
+  const [owner, setOwner] = useState<OwnerProfile | null>(null);
 
   useEffect(() => {
-    async function fetchOwner() {
-      const { data, error } = await supabase
-        .from("profiles")
-        .select("avatar, first_name, last_name")
-        .eq("user_id", ownerId)
-        .single();
+    getOwnerProfile(listing.user_id).then(setOwner);
+  }, [listing.user_id]);
 
-      if (error) {
-        console.error(`Error fetching owner data: ${error.message}`);
-        return;
-      }
-      setOwnerData(data);
-    }
-    fetchOwner();
-  }, [ownerId, supabase]);
-
-  const ownerName = ownerData
-    ? `${ownerData?.first_name ?? ""} ${ownerData?.last_name ?? ""}`
-    : "Unknown";
+  if(!owner) return null
 
   return (
     <Card className="flex flex-row items-start max-lg:flex-col mt-10 justify-between bg-transparent border-none shadow-none">
@@ -36,13 +21,15 @@ export function OwnerInfo({ listing }: ListingSectionProps) {
         <div className="flex items-center">
           <Avatar>
             <AvatarImage
-              src={ownerData?.avatar}
+              src={owner?.avatar}
               alt="@shadcn"
               className="size-15 rounded-[100px] object-cover"
             />
           </Avatar>
           <CardContent>
-            <CardTitle className="text-lg">Owned by {ownerName}</CardTitle>
+            <CardTitle className="text-lg">
+              Owned by {owner?.first_name} {owner?.last_name}
+            </CardTitle>
             <CardAction className="mt-3">
               <Button>Message</Button>
             </CardAction>

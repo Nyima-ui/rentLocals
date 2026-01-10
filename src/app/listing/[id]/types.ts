@@ -35,3 +35,13 @@ export interface OwnerProfile {
   first_name: string;
   last_name: string;
 }
+
+export interface BookingDetails {
+  renter: {
+    last_name: string;
+    first_name: string;
+  };
+  listing: {
+    title: string;
+  };
+}
