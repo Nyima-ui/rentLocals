@@ -45,3 +45,12 @@ export interface BookingDetails {
     title: string;
   };
 }
+
+export interface RequestBookingActionProps {
+  listingId: string;
+  ownerId: string;
+  renterId: string;
+  start: string;
+  end: string;
+  pricePerDay: number;
+}

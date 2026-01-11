@@ -11,12 +11,16 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage } from "@radix-ui/react-avatar";
 import Link from "next/link";
 import { capitalaize } from "@/lib/utils";
-import { IncomingBooking } from "./types";
+import { RenterBookingInfoProps } from "./types";
 import BookingSummary from "./BookingSummary";
+import PickupAddress from "./PickupAddress";
 
-export function RenterBookingInfo({ booking }: { booking: IncomingBooking }) {
+export function RenterBookingInfo({
+  booking,
+  address,
+}: RenterBookingInfoProps) {
   return (
-    <Card className="bg-transparent shadow-none min-w-1/2">
+    <Card className="bg-transparent shadow-none min-w-1/2 gap-0">
       <CardHeader>
         <CardTitle>
           Bookign ID:{" "}
@@ -27,12 +31,7 @@ export function RenterBookingInfo({ booking }: { booking: IncomingBooking }) {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="max-w-xs border-b-2 pb-1.5">
-          <p className="text-base text-gray-700 leading-tight">
-            Pickup address will be shown after approval.
-          </p>
-        </div>
-        <CardTitle className="text-2xl mt-5">
+        <CardTitle className="text-2xl mt-2">
           <Link
             href={`/listing/${booking.listing_id}`}
             className="leading-tight"
@@ -40,6 +39,32 @@ export function RenterBookingInfo({ booking }: { booking: IncomingBooking }) {
             {booking.listings.title}
           </Link>
         </CardTitle>
+        {/* pick up address  */}
+        {booking.status === "booked" && (
+          <>
+            <CardDescription className="text-black text-base mt-3">
+              <span className="cursor-pointer underline">
+                {booking.owner.first_name}
+              </span>{" "}
+              accepted your request to rent{" "}
+              <span className="text-blue-500">{booking.listings.title}</span>
+            </CardDescription>
+            <CardDescription className="text-black text-base">
+              Below is the pick up location.
+            </CardDescription>
+          </>
+        )}
+        {booking.status === "requested" && (
+          <CardDescription>
+            <p className="text-[15px] text-black mt-3">
+              You request to rent{" "}
+              <span className="text-blue-600">{booking.listings.title}</span>{" "}
+              has been sent to{" "}
+              <span className="cursor-pointer underline">{booking.owner.first_name}</span>
+            </p>
+          </CardDescription>
+        )}
+        <PickupAddress address={address} />
         <div className="flex items-center gap-2 mt-7">
           <Avatar className="size-13! rounded-full overflow-hidden">
             <AvatarImage src={booking.owner.avatar} className="object-cover" />
@@ -51,7 +76,7 @@ export function RenterBookingInfo({ booking }: { booking: IncomingBooking }) {
         {/* rental period */}
         <BookingSummary booking={booking} />
       </CardContent>
-      <CardFooter>
+      <CardFooter className="mt-5">
         <CardAction className="mx-auto">
           <Button variant="outline" className="cursor-pointer py-6">
             Cancel Request

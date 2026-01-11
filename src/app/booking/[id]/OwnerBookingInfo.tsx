@@ -1,3 +1,4 @@
+"use client";
 import {
   Card,
   CardTitle,
@@ -10,12 +11,46 @@ import {
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { Avatar, AvatarImage } from "@radix-ui/react-avatar";
-import { IncomingBooking } from "./types";
+import { IncomingBooking, OwnerBookingInfoProps } from "./types";
 import { capitalaize } from "@/lib/utils";
 import BookingSummary from "./BookingSummary";
-import { approveRequest } from "./hooks";
+import { approveRequest } from "./actions";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import PickupAddress from "./PickupAddress";
 
-export function OwnerBookingInfo({ booking }: { booking: IncomingBooking }) {
+export function OwnerBookingInfo({
+  booking,
+  address,
+  setAddress,
+  updateBookingStatus,
+}: OwnerBookingInfoProps) {
+  const [isLoading, setIsLoading] = useState(false);
+
+  // console.log(booking);
+  async function handleApprove() {
+    setIsLoading(true);
+    try {
+      const address = await approveRequest({
+        id: booking.booking_id,
+        listingId: booking.listing_id,
+        title: booking.listings.title,
+        start: booking.start_date,
+        end: booking.end_date,
+        pricePerDay: booking.price_per_day,
+      });
+      updateBookingStatus("booked");
+      if (address) {
+        setAddress(address);
+      }
+    } catch (error) {
+      console.error("Failed to approve:", error);
+      //optionally show error toast/notification here
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
   return (
     <Card className="bg-transparent shadow-none min-w-1/2 gap-0">
       <CardHeader>
@@ -36,19 +71,26 @@ export function OwnerBookingInfo({ booking }: { booking: IncomingBooking }) {
             {booking.listings.title}
           </Link>
         </CardTitle>
-        <div className="border-b-2 border-red-300 pb-1.5 mt-3 max-w-xs">
-          <p>
-            <Link href="#" className="text-blue-600">
-              {booking.renter.first_name} {booking.renter.last_name}
-            </Link>{" "}
-            has requested to rent your listing.
-          </p>
+        <div className="border-b-2 border-red-300 pb-1.5 mt-3 max-w-sm">
+          {booking.status === "requested" && (
+            <p>
+              <Link href="#" className="text-blue-600">
+                {booking.renter.first_name} {booking.renter.last_name}
+              </Link>{" "}
+              has requested to rent your listing.
+            </p>
+          )}
+          {booking.status === "booked" && (
+            <p>
+              You accepted{" "}
+              <Link href="#" className="text-blue-600">
+                {booking.renter.first_name} {booking.renter.last_name}
+              </Link>{" "}
+              requests to rent your listing.
+            </p>
+          )}
         </div>
-        <div className="max-w-xs border-b-2 pb-1.5 mt-2">
-          <p className="text-base text-gray-700 leading-tight">
-            Pickup address will be shown after approval.
-          </p>
-        </div>
+        <PickupAddress address={address} />
         <div className="flex items-center gap-2 mt-6">
           <Avatar>
             <AvatarImage
@@ -64,12 +106,16 @@ export function OwnerBookingInfo({ booking }: { booking: IncomingBooking }) {
       </CardContent>
       <CardFooter className="mt-5">
         <CardAction className="mx-auto">
-          <Button
-            className="cursor-pointer py-6"
-            onClick={() => approveRequest(booking.booking_id)}
-          >
-            Approve Request
-          </Button>
+          {booking.status === "requested" && (
+            <Button className="cursor-pointer py-6" onClick={handleApprove}>
+              {isLoading ? "Approving" : "Approve Request"}
+            </Button>
+          )}
+          {booking.status === "booked" && (
+            <Button variant={"outline"} className="py-6 cursor-pointer">
+              Cancel Request
+            </Button>
+          )}
         </CardAction>
       </CardFooter>
     </Card>

@@ -8,21 +8,31 @@ import { getBookingDetails } from "./hooks";
 import OwnerBookingInfo from "./OwnerBookingInfo";
 import RenterBookingInfo from "./RenterBookinInfo";
 import { useAuth } from "@/context/AuthContext";
+import { getPickupLocation } from "./actions";
 
 const Booking = () => {
-  const { id } = useParams();
+  const params = useParams();
+  const id = params?.id as string;
   const [booking, setBooking] = useState<IncomingBooking | null>(null);
+  const [address, setAddress] = useState<string | null>(null);
   const { user } = useAuth();
 
   useEffect(() => {
-    if (id && typeof id === "string") {
-      getBookingDetails(id).then(setBooking);
-    }
+    if (!id) return;
+    getBookingDetails(id).then(setBooking);
   }, [id]);
 
   useEffect(() => {
-    console.log(booking);
-  }, [booking]);
+    if (!booking) return;
+    if (booking.status !== "booked") return;
+    getPickupLocation(booking.listing_id).then(setAddress);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [booking?.status, booking?.listing_id]);
+
+  function updateBookingStatus(newStatus: IncomingBooking["status"]) {
+    if (!booking) return;
+    setBooking({ ...booking, status: newStatus });
+  }
 
   if (!booking) {
     return (
@@ -40,8 +50,17 @@ const Booking = () => {
     <section className="max-w-6xl mx-auto max-xl:px-5 mb-15">
       <SearchBox />
       <div className="mt-17 flex justify-between max-md:flex-col gap-5">
-        {role === "renter" && <RenterBookingInfo booking={booking} />}
-        {role === "owner" && <OwnerBookingInfo booking={booking} />}
+        {role === "renter" && (
+          <RenterBookingInfo booking={booking} address={address} />
+        )}
+        {role === "owner" && (
+          <OwnerBookingInfo
+            booking={booking}
+            address={address}
+            setAddress={setAddress}
+            updateBookingStatus={updateBookingStatus}
+          />
+        )}
         <Chat booking={booking} />
       </div>
     </section>

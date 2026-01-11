@@ -1,3 +1,5 @@
+import { Dispatch, SetStateAction } from "react";
+
 export interface Booking {
   listing_id: string;
   owner_id: string;
@@ -27,14 +29,24 @@ export interface IncomingBooking extends Booking {
   };
 }
 
-export interface ChatProps {
+export interface ApproveRequestProps {
+  id: string;
+  listingId: string;
+  title: string;
+  start: string;
+  end: string;
+  pricePerDay: number;
+}
+
+export interface OwnerBookingInfoProps {
   booking: IncomingBooking;
+  address: string | null;
+  setAddress: Dispatch<SetStateAction<string | null>>;
+  updateBookingStatus: (status: IncomingBooking["status"]) => void;
 }
 
 export interface RenterBookingInfoProps {
   booking: IncomingBooking;
+  address: string | null;
 }
 
-export interface SystemMessageProps {
-  date: string;
-}

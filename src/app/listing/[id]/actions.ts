@@ -1,8 +1,10 @@
 "use server";
 import { createClient } from "@/lib/supabase/server";
 import { calculateTotalPrice, preventDoubleBooking } from "./booking";
-import { notifyOwner } from "./notifications";
+import { notify } from "../../notifications";
 import { SupabaseClient } from "@supabase/supabase-js";
+import { bookingRequestEmail } from "@/app/emails/bookinRequest";
+import { RequestBookingActionProps } from "./types";
 
 async function getBookingDetails(supabase: SupabaseClient, id: string) {
   const { data, error } = await supabase
@@ -29,14 +31,7 @@ export async function requestBookingAction({
   start,
   end,
   pricePerDay,
-}: {
-  listingId: string;
-  ownerId: string;
-  renterId: string;
-  start: string;
-  end: string;
-  pricePerDay: number;
-}) {
+}: RequestBookingActionProps) {
   const supabase = await createClient();
   const existingBooking = await preventDoubleBooking(
     supabase,
@@ -75,57 +70,17 @@ export async function requestBookingAction({
     .single();
 
   if (owner?.email) {
-    await notifyOwner({
+    await notify({
       to: owner.email,
       subject: "New booking request",
-      html: `<div style="font-family: sans-serif; line-height: 1.6;">
-        <h2>New booking request</h2>
-
-        <p>
-          <strong>${
-            bookingDetails.renter.first_name ?? "A renter"
-          }</strong> has requested to book your listing:
-        </p>
-
-        <p>
-          <strong>${bookingDetails.listing.title}</strong>
-        </p>
-
-        <p>
-          📅 <strong>Dates:</strong>
-          ${new Date(start).toDateString()} → ${new Date(end).toDateString()}
-        </p>
-
-        <p>
-          💰 <strong>Total price:</strong> ₹${calculateTotalPrice(
-            start,
-            end,
-            pricePerDay
-          )}
-        </p>
-
-        <p>
-          <a
-            href="http://localhost:3000//booking/${booking.booking_id}"
-            style="
-              display: inline-block;
-              padding: 10px 16px;
-              background: #111;
-              color: #fff;
-              text-decoration: none;
-              border-radius: 6px;
-            "
-          >
-            Review request
-          </a>
-        </p>
-
-        <hr />
-
-        <p style="font-size: 12px; color: #666;">
-          This email was sent by <strong>RentLocals</strong>.
-        </p>
-      </div>`,
+      html: bookingRequestEmail({
+        renter: bookingDetails.renter.first_name,
+        title: bookingDetails.listing.title,
+        start,
+        end,
+        bookingId: booking.booking_id,
+        pricePerDay,
+      }),
     });
   }
 

@@ -17,12 +17,4 @@ export async function getBookingDetails(
   return data;
 }
 
-export async function approveRequest(id: string) {
-  const supabase = createClient();
-  const { error } = await supabase
-    .from("bookings")
-    .update({ status: "booked" })
-    .eq("booking_id", id);
 
-  if (error) throw error;
-}
