@@ -42,14 +42,14 @@ export function RenterBookingInfo({
         {/* pick up address  */}
         {booking.status === "booked" && (
           <>
-            <CardDescription className="text-black text-base mt-3">
-              <span className="cursor-pointer underline">
+            <CardDescription className="text-black text-base mt-3 border-b-2 border-red-300 font-medium pb-1">
+              <span className="cursor-pointer text-sky-500">
                 {booking.owner.first_name}
               </span>{" "}
               accepted your request to rent{" "}
               <span className="text-blue-500">{booking.listings.title}</span>
             </CardDescription>
-            <CardDescription className="text-black text-base">
+            <CardDescription className="text-black text-base mt-2">
               Below is the pick up location.
             </CardDescription>
           </>

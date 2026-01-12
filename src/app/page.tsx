@@ -67,7 +67,7 @@ export function Navbar() {
                       href={`/listings/${user?.id}`}
                       className="hover:opacity-50 transition-all duration-150 ease-in"
                     >
-                      Listings
+                       My listings
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem
@@ -75,10 +75,21 @@ export function Navbar() {
                     asChild
                   >
                     <Link
-                      href={`/bookings/${user?.id}`}
+                      href={`/mybookings/${user?.id}`}
                       className="block hover:opacity-50 transition-all duration-150 ease-in"
                     >
-                      Bookings
+                      My bookings
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onSelect={() => setIsDropDownOpen(false)}
+                    asChild
+                  >
+                    <Link
+                      href={`/myrentals/${user?.id}`}
+                      className="block hover:opacity-50 transition-all duration-150 ease-in"
+                    >
+                      My rentals  
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem

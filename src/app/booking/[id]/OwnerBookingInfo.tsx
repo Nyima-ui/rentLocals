@@ -116,6 +116,11 @@ export function OwnerBookingInfo({
               Cancel Request
             </Button>
           )}
+          {booking.status === "booked" && (
+            <Button variant={"outline"} className="py-6 cursor-pointer">
+              Cancel Request
+            </Button>
+          )}
         </CardAction>
       </CardFooter>
     </Card>
