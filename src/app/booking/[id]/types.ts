@@ -6,7 +6,7 @@ export interface Booking {
   renter_id: string;
   start_date: string;
   end_date: string;
-  status: "requested" | "booked" | "declined" | "cancelled";
+  status: "requested" | "booked" | "declined" | "cancelled" | "expired";
   price_per_day: number;
   total_price: number;
 }

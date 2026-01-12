@@ -57,7 +57,7 @@ export function RenterBookingInfo({
         {booking.status === "requested" && (
           <CardDescription>
             <p className="text-[15px] text-black mt-3">
-              You request to rent{" "}
+              Your request to rent{" "}
               <span className="text-blue-600">{booking.listings.title}</span>{" "}
               has been sent to{" "}
               <span className="cursor-pointer underline">{booking.owner.first_name}</span>

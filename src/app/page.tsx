@@ -63,7 +63,23 @@ export function Navbar() {
                     onSelect={() => setIsDropDownOpen(false)}
                     asChild
                   >
-                    <Link href={`/listings/${user?.id}`}>Listings</Link>
+                    <Link
+                      href={`/listings/${user?.id}`}
+                      className="hover:opacity-50 transition-all duration-150 ease-in"
+                    >
+                      Listings
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onSelect={() => setIsDropDownOpen(false)}
+                    asChild
+                  >
+                    <Link
+                      href={`/bookings/${user?.id}`}
+                      className="block hover:opacity-50 transition-all duration-150 ease-in"
+                    >
+                      Bookings
+                    </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     onSelect={async () => {
@@ -72,7 +88,7 @@ export function Navbar() {
                       router.push("/");
                     }}
                     asChild
-                    className="cursor-pointer block"
+                    className="cursor-pointer block hover:opacity-50 transition-all duration-150 ease-in"
                   >
                     <button>Log out</button>
                   </DropdownMenuItem>

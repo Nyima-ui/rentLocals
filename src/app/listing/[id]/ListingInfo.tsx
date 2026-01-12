@@ -11,6 +11,8 @@ import { Listing, IncomingPrices } from "./types";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
 import { requestBookingAction } from "./actions";
+import { useEffect, useState } from "react";
+import { checkIfBookedByTheSameRenter } from "./hooks";
 
 export function ListingInfo({
   listing,
@@ -21,6 +23,9 @@ export function ListingInfo({
 }) {
   const { user } = useAuth();
   const router = useRouter();
+  const [listingStatus, setListingStatus] = useState<
+    "requested" | "booked" | null
+  >(null);
   const isOwnerOfTheListing = listing.user_id === user?.id;
 
   async function requestBooking(e: React.FormEvent<HTMLFormElement>) {
@@ -40,6 +45,20 @@ export function ListingInfo({
 
     router.push(`/booking/${result.bookingId}`);
   }
+
+  useEffect(() => {
+    async function checkIsBookedOrRequested() {
+      if (!user?.id) return;
+
+      const isBookedOrRequested = await checkIfBookedByTheSameRenter({
+        renterId: user?.id,
+        ownerId: listing.user_id,
+        listingId: listing.listing_id,
+      });
+      setListingStatus(isBookedOrRequested);
+    }
+    checkIsBookedOrRequested();
+  }, [listing.listing_id, user?.id, listing.user_id]);
 
   return (
     <div className="grow space-y-3 w-1/2 max-md:w-full">
@@ -77,13 +96,25 @@ export function ListingInfo({
             Price for 1 day
           </FieldDescription>
         </div>
-        <Button
-          className="mt-5 cursor-pointer"
-          type="submit"
-          disabled={isOwnerOfTheListing}
-        >
-          Request Booking
-        </Button>
+        {!listingStatus && (
+          <Button
+            className="mt-5 cursor-pointer"
+            type="submit"
+            disabled={isOwnerOfTheListing}
+          >
+            Request Booking
+          </Button>
+        )}
+        {listingStatus === "requested" && (
+          <Button className="mt-5 cursor-pointer" type="submit" disabled={true}>
+            Requested
+          </Button>
+        )}
+        {listingStatus === "booked" && (
+          <Button className="mt-5 cursor-pointer" type="submit" disabled={true}>
+            Booked
+          </Button>
+        )}
       </form>
       <div className="mt-10">
         <p className="text-lg">Price for all periods</p>

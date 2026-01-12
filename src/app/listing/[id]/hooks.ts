@@ -35,3 +35,35 @@ export async function getOwnerProfile(
 
   return data ?? null;
 }
+
+export interface CheckIfBookedByTheSameRenterProps {
+  renterId: string;
+  ownerId: string;
+  listingId: string;
+}
+//better function name?
+export async function checkIfBookedByTheSameRenter({
+  renterId,
+  ownerId,
+  listingId,
+}: CheckIfBookedByTheSameRenterProps): Promise<"requested" | "booked" | null> {
+  const { data: booking, error } = await supabase
+    .from("bookings")
+    .select()
+    .eq("renter_id", renterId)
+    .eq("owner_id", ownerId)
+    .eq("listing_id", listingId)
+    .maybeSingle();
+
+  if (error) throw error;
+  if (!booking) return null;
+
+  if (booking.status === "requested") {
+    return "requested";
+  }
+
+  if (booking.status === "booked") {
+    return "booked";
+  }
+  return null;
+}

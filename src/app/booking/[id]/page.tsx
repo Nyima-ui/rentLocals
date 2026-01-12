@@ -9,12 +9,14 @@ import OwnerBookingInfo from "./OwnerBookingInfo";
 import RenterBookingInfo from "./RenterBookinInfo";
 import { useAuth } from "@/context/AuthContext";
 import { getPickupLocation } from "./actions";
+import { createClient } from "@/lib/supabase/client";
 
 const Booking = () => {
   const params = useParams();
   const id = params?.id as string;
   const [booking, setBooking] = useState<IncomingBooking | null>(null);
   const [address, setAddress] = useState<string | null>(null);
+  const supabase = createClient();
   const { user } = useAuth();
 
   useEffect(() => {
@@ -28,6 +30,30 @@ const Booking = () => {
     getPickupLocation(booking.listing_id).then(setAddress);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [booking?.status, booking?.listing_id]);
+
+  useEffect(() => {
+    if (!id) return;
+
+    const channel = supabase
+      .channel("booking-updates")
+      .on(
+        "postgres_changes",
+        {
+          event: "UPDATE",
+          schema: "public",
+          table: "bookings",
+          filter: `booking_id=eq.${id}`,
+        },
+        () => {
+          getBookingDetails(id).then(setBooking);
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [id, supabase]);
 
   function updateBookingStatus(newStatus: IncomingBooking["status"]) {
     if (!booking) return;
