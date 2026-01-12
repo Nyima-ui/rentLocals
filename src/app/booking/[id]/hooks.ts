@@ -17,4 +17,12 @@ export async function getBookingDetails(
   return data;
 }
 
+export async function confirmPickUp(bookingId: string) {
+  const supabase = createClient();
+  const { error } = await supabase
+    .from("bookings")
+    .update({ status: "in_use" })
+    .eq("booking_id", bookingId);
 
+  if (error) throw error;
+}

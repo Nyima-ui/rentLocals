@@ -14,6 +14,7 @@ import { capitalaize } from "@/lib/utils";
 import { RenterBookingInfoProps } from "./types";
 import BookingSummary from "./BookingSummary";
 import PickupAddress from "./PickupAddress";
+import { confirmPickUp } from "./hooks";
 
 export function RenterBookingInfo({
   booking,
@@ -40,7 +41,7 @@ export function RenterBookingInfo({
           </Link>
         </CardTitle>
         {/* pick up address  */}
-        {booking.status === "booked" && (
+        {(booking.status === "booked" || booking.status === "in_use") && (
           <>
             <CardDescription className="text-black text-base mt-3 border-b-2 border-red-300 font-medium pb-1">
               <span className="cursor-pointer text-sky-500">
@@ -60,7 +61,9 @@ export function RenterBookingInfo({
               Your request to rent{" "}
               <span className="text-blue-600">{booking.listings.title}</span>{" "}
               has been sent to{" "}
-              <span className="cursor-pointer underline">{booking.owner.first_name}</span>
+              <span className="cursor-pointer underline">
+                {booking.owner.first_name}
+              </span>
             </p>
           </CardDescription>
         )}
@@ -78,9 +81,19 @@ export function RenterBookingInfo({
       </CardContent>
       <CardFooter className="mt-5">
         <CardAction className="mx-auto">
-          <Button variant="outline" className="cursor-pointer py-6">
-            Cancel Request
-          </Button>
+          {booking.status === "booked" && (
+            <Button
+              className="px-3 py-5 cursor-pointer"
+              onClick={() => confirmPickUp(booking.booking_id)}
+            >
+              Picked up
+            </Button>
+          )}
+          {(booking.status === "requested" || booking.status === "booked") && (
+            <Button variant="outline" className="px-3 py-5 cursor-pointer">
+              Cancel Request
+            </Button>
+          )}
         </CardAction>
       </CardFooter>
     </Card>

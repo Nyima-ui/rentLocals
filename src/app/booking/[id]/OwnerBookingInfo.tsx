@@ -26,7 +26,6 @@ export function OwnerBookingInfo({
   updateBookingStatus,
 }: OwnerBookingInfoProps) {
   const [isLoading, setIsLoading] = useState(false);
-
   // console.log(booking);
   async function handleApprove() {
     setIsLoading(true);
@@ -80,7 +79,7 @@ export function OwnerBookingInfo({
               has requested to rent your listing.
             </p>
           )}
-          {booking.status === "booked" && (
+          {(booking.status === "booked" || booking.status === "in_use") && (
             <p>
               You accepted{" "}
               <Link href="#" className="text-blue-600">
@@ -112,14 +111,12 @@ export function OwnerBookingInfo({
             </Button>
           )}
           {booking.status === "booked" && (
-            <Button variant={"outline"} className="py-6 cursor-pointer">
-              Cancel Request
+            <Button variant={"outline"} className="px-3 py-5 cursor-pointer">
+              Decline request
             </Button>
           )}
-          {booking.status === "booked" && (
-            <Button variant={"outline"} className="py-6 cursor-pointer">
-              Cancel Request
-            </Button>
+          {booking.status === "in_use" && (
+            <Button className="px-3 py-5 cursor-pointer">Item returned</Button>
           )}
         </CardAction>
       </CardFooter>

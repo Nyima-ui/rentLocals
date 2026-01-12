@@ -7,7 +7,11 @@ export function cn(...inputs: ClassValue[]) {
 
 export function capitalaize(str: string) {
   if (!str) return "";
-  return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+  const splittedText = str.split("");
+  const hyphenIndex = splittedText.indexOf("_");
+  splittedText[hyphenIndex] = " ";
+  splittedText[0] = splittedText[0].toUpperCase();
+  return splittedText.join("");
 }
 
 export function formatStartEndDate(isoString: string) {
