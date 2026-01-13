@@ -11,13 +11,13 @@ import {
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { Avatar, AvatarImage } from "@radix-ui/react-avatar";
-import { IncomingBooking, OwnerBookingInfoProps } from "./types";
+import { OwnerBookingInfoProps } from "./types";
 import { capitalaize } from "@/lib/utils";
 import BookingSummary from "./BookingSummary";
 import { approveRequest } from "./actions";
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import PickupAddress from "./PickupAddress";
+import { confirmReturned } from "./hooks";
 
 export function OwnerBookingInfo({
   booking,
@@ -26,7 +26,7 @@ export function OwnerBookingInfo({
   updateBookingStatus,
 }: OwnerBookingInfoProps) {
   const [isLoading, setIsLoading] = useState(false);
-  // console.log(booking);
+
   async function handleApprove() {
     setIsLoading(true);
     try {
@@ -45,6 +45,17 @@ export function OwnerBookingInfo({
     } catch (error) {
       console.error("Failed to approve:", error);
       //optionally show error toast/notification here
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  async function handleConfirmReturned(bookingId: string): Promise<void> {
+    try {
+      setIsLoading(true);
+      await confirmReturned(bookingId);
+    } catch (error) {
+      console.error(`Error cofirming return: ${error}`);
     } finally {
       setIsLoading(false);
     }
@@ -70,7 +81,7 @@ export function OwnerBookingInfo({
             {booking.listings.title}
           </Link>
         </CardTitle>
-        <div className="border-b-2 border-red-300 pb-1.5 mt-3 max-w-sm">
+        <div className="border-b-2 border-red-300 pb-1.5 mt-3 max-w-md">
           {booking.status === "requested" && (
             <p>
               <Link href="#" className="text-blue-600">
@@ -80,13 +91,16 @@ export function OwnerBookingInfo({
             </p>
           )}
           {(booking.status === "booked" || booking.status === "in_use") && (
-            <p>
+            <p className="font-medium">
               You accepted{" "}
               <Link href="#" className="text-blue-600">
                 {booking.renter.first_name} {booking.renter.last_name}
               </Link>{" "}
               requests to rent your listing.
             </p>
+          )}
+          {booking.status === "returned" && (
+            <p className="font-medium">You listing has been returned to you.</p>
           )}
         </div>
         <PickupAddress address={address} />
@@ -116,7 +130,15 @@ export function OwnerBookingInfo({
             </Button>
           )}
           {booking.status === "in_use" && (
-            <Button className="px-3 py-5 cursor-pointer">Item returned</Button>
+            <Button
+              className="px-3 py-5 cursor-pointer"
+              disabled={isLoading}
+              onClick={() => {
+                handleConfirmReturned(booking.booking_id);
+              }}
+            >
+              {isLoading ? "Confirming..." : "Item returned"}
+            </Button>
           )}
         </CardAction>
       </CardFooter>

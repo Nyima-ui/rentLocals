@@ -15,7 +15,7 @@ import { useRouter } from "next/navigation";
 import { GetRenterBookingsProps } from "./types";
 import { capitalaize } from "@/lib/utils";
 
-export function CurrentBookingsCard({
+export function MyBookingsCard({
   booking,
 }: {
   booking: GetRenterBookingsProps;
@@ -43,7 +43,9 @@ export function CurrentBookingsCard({
           </CardContent>
           <CardFooter className="px-2 flex-col gap-3">
             <div className="flex w-full gap-3">
-              <Button className="grow bg-sky-500 hover:bg-sky-600 cursor-pointer">View booking</Button>
+              <Button className="grow bg-sky-500 hover:bg-sky-600 cursor-pointer">
+                View booking
+              </Button>
             </div>
           </CardFooter>
           <span className="absolute text-white bg-gray-500 right-2 top-2 p-1 rounded-md">
@@ -56,9 +58,8 @@ export function CurrentBookingsCard({
 }
 
 const MyBookings = () => {
-  const [currentBookings, setCurrentBookings] = useState<
-    GetRenterBookingsProps[]
-  >([]);
+  const [myBookings, setMyBookings] = useState<GetRenterBookingsProps[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const { user } = useAuth();
   useEffect(() => {
@@ -68,11 +69,14 @@ const MyBookings = () => {
     const userId = user.id;
     async function load() {
       try {
-        const currentBookings = await getRenterBookings(userId);
-        setCurrentBookings(currentBookings);
-        console.log(currentBookings);
+        setIsLoading(true);
+        const myBookings = await getRenterBookings(userId);
+        setMyBookings(myBookings);
+        console.log(myBookings);
       } catch (error) {
         console.error("Failed to fetch renter bookings:", error);
+      } finally {
+        setIsLoading(false);
       }
     }
     load();
@@ -80,11 +84,19 @@ const MyBookings = () => {
   return (
     <div className="max-w-6xl mx-auto max-xl:px-5">
       <h1 className="text-3xl">Your current bookings</h1>
-      <ul className="grid mt-7 grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-3 max-xl:px-5">
-        {currentBookings.map((booking, idx) => (
-          <CurrentBookingsCard key={idx} booking={booking} />
-        ))}
-      </ul>
+      {isLoading ? (
+        <p className="mt-3 text-lg font-medium">Loading...</p>
+      ) : myBookings.length === 0 ? (
+        <p className="text-lg mt-4 font-medium">
+          You have not rented any items yet.
+        </p>
+      ) : (
+        <ul className="grid mt-7 grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-3 max-xl:px-5">
+          {myBookings.map((booking, idx) => (
+            <MyBookingsCard key={idx} booking={booking} />
+          ))}
+        </ul>
+      )}
     </div>
   );
 };

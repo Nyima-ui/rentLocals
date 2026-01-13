@@ -13,7 +13,8 @@ const BookingSummary = ({ booking }: { booking: IncomingBooking }) => {
             {new Date(booking.end_date).getFullYear()}
           </p>
           <CardDescription className="text-gray-500">
-            Rental period
+            Rental period{" "}
+            {booking.status === "returned" && <span>(Expired)</span>}
           </CardDescription>
         </div>
       </div>

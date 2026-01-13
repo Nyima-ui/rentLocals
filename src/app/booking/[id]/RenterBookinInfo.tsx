@@ -15,11 +15,24 @@ import { RenterBookingInfoProps } from "./types";
 import BookingSummary from "./BookingSummary";
 import PickupAddress from "./PickupAddress";
 import { confirmPickUp } from "./hooks";
+import { useState } from "react";
 
 export function RenterBookingInfo({
   booking,
   address,
 }: RenterBookingInfoProps) {
+  const [isLoading, setIsLoading] = useState(false);
+
+  async function handlePickUp(bookingId: string): Promise<void> {
+    try {
+      setIsLoading(true);
+      await confirmPickUp(bookingId);
+    } catch (err) {
+      console.error(`Error confirming pick up: ${err}`);
+    } finally {
+      setIsLoading(false);
+    }
+  }
   return (
     <Card className="bg-transparent shadow-none min-w-1/2 gap-0">
       <CardHeader>
@@ -67,6 +80,11 @@ export function RenterBookingInfo({
             </p>
           </CardDescription>
         )}
+        {booking.status === "returned" && (
+          <CardDescription className="font-medium text-base text-black mt-2 border-b-2 border-red-300">
+            You have returned your rental.
+          </CardDescription>
+        )}
         <PickupAddress address={address} />
         <div className="flex items-center gap-2 mt-7">
           <Avatar className="size-13! rounded-full overflow-hidden">
@@ -83,10 +101,11 @@ export function RenterBookingInfo({
         <CardAction className="mx-auto">
           {booking.status === "booked" && (
             <Button
-              className="px-3 py-5 cursor-pointer"
-              onClick={() => confirmPickUp(booking.booking_id)}
+              className="px-3 py-5 cursor-pointer mr-5"
+              onClick={() => handlePickUp(booking.booking_id)}
+              disabled={isLoading}
             >
-              Picked up
+              {isLoading ? "Confirming..." : "Picked up"}
             </Button>
           )}
           {(booking.status === "requested" || booking.status === "booked") && (

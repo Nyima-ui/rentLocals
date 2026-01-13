@@ -11,7 +11,6 @@ export interface Booking {
     | "booked"
     | "in_use"
     | "returned"
-    | "completed"
     | "cancelled"
     | "declined";
   price_per_day: number;

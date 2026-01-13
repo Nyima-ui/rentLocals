@@ -17,7 +17,7 @@ export async function getBookingDetails(
   return data;
 }
 
-export async function confirmPickUp(bookingId: string) {
+export async function confirmPickUp(bookingId: string): Promise<void> {
   const supabase = createClient();
   const { error } = await supabase
     .from("bookings")
@@ -25,4 +25,18 @@ export async function confirmPickUp(bookingId: string) {
     .eq("booking_id", bookingId);
 
   if (error) throw error;
+}
+
+export async function confirmReturned(bookingId: string): Promise<void> {
+  const supabase = createClient();
+  const { error } = await supabase
+    .from("bookings")
+    .update({ status: "returned" })
+    .eq("booking_id", bookingId);
+
+  if (error) throw error;
+}
+
+export async function declineRequest(bookingId: string): Promise<void> {
+  
 }
