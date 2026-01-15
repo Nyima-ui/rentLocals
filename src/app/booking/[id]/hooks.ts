@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/client";
-import { IncomingBooking } from "./types";
+import { IncomingBooking, OutgoingMessageProps } from "./types";
 
 export async function getBookingDetails(
   id: string
@@ -55,4 +55,28 @@ export async function cancelRequest(bookingId: string): Promise<void> {
     .eq("booking_id", bookingId);
 
   if (error) throw error;
+}
+
+export async function sendMessage(messageDetails: OutgoingMessageProps) {
+  const supabase = createClient();
+  const { data, error } = await supabase
+    .from("chats")
+    .insert(messageDetails)
+    .select("*")
+    .single();
+
+  if (error) throw error;
+  return data;
+}
+
+export async function getMessages(bookingId: string) {
+  const supabase = createClient();
+  const { data, error } = await supabase
+    .from("chats")
+    .select("*")
+    .eq("booking_id", bookingId)
+    .order("created_at", { ascending: true });
+
+  if (error) throw error;
+  return data;
 }

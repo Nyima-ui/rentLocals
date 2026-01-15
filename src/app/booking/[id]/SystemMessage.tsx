@@ -13,17 +13,6 @@ interface SystemMessageProps {
 }
 
 
-export function shouldRenderStatus(
-  current: IncomingBooking["status"],
-  target: IncomingBooking["status"]
-) {
-  if (current === "cancelled" || current === "declined") {
-    return target === "requested" || target === current;
-  }
-
-  const FLOW = ["requested", "booked", "in_use", "returned"];
-  return FLOW.indexOf(current) >= FLOW.indexOf(target);
-}
 
 export function SystemRequestMessage({
   date,

@@ -55,3 +55,31 @@ export interface RenterBookingInfoProps {
   booking: IncomingBooking;
   address: string | null;
 }
+
+export interface IncomingChats {
+  message_id: string;
+  sender_id: string;
+  receiver_id: string;
+  booking_id: string;
+  listing_id: string;
+  message: string;
+  is_read: boolean;
+  created_at: string;
+  type: string;
+  system_action:
+    | "requested"
+    | "booked"
+    | "in_use"
+    | "returned"
+    | "cancelled"
+    | "declined"
+    | null;
+}
+
+export interface OutgoingMessageProps {
+  sender_id: string;
+  receiver_id: string;
+  listing_id: string;
+  booking_id: string;
+  message: string;
+}

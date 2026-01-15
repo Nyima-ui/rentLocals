@@ -9,7 +9,7 @@ body{
   overflow-x: hidden;
 }
 .no-scrollbar::-webkit-scrollbar{
-  scrollbar-width: none;
+  scrollbar-width: thin;
 }
 @theme inline {
   --color-background: var(--background);
