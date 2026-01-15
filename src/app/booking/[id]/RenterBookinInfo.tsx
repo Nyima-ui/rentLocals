@@ -14,7 +14,7 @@ import { capitalaize } from "@/lib/utils";
 import { RenterBookingInfoProps } from "./types";
 import BookingSummary from "./BookingSummary";
 import PickupAddress from "./PickupAddress";
-import { cancelRequest, confirmPickUp } from "./hooks";
+import { cancelRequest, confirmPickUp, insertPickedUpMessage } from "./hooks";
 import { useState } from "react";
 
 export function RenterBookingInfo({
@@ -27,6 +27,14 @@ export function RenterBookingInfo({
     try {
       setIsLoading(true);
       await confirmPickUp(bookingId);
+      await insertPickedUpMessage({
+        sender_id: booking.renter_id,
+        receiver_id: booking.owner_id,
+        listing_id: booking.listing_id,
+        booking_id: booking.booking_id,
+        type: "system",
+        system_action: "in_use",
+      });
     } catch (err) {
       console.error(`Error confirming pick up: ${err}`);
     } finally {

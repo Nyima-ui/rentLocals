@@ -1,5 +1,7 @@
 import { createClient } from "@/lib/supabase/client";
 import { IncomingBooking, OutgoingMessageProps } from "./types";
+import { SystemMessageProps } from "@/app/globalTypes";
+
 
 export async function getBookingDetails(
   id: string
@@ -79,4 +81,33 @@ export async function getMessages(bookingId: string) {
 
   if (error) throw error;
   return data;
+}
+
+
+//insert approve message 
+export async function insertApprovedMessage(message: SystemMessageProps) {
+  const supabase = await createClient();
+  const { error } = await supabase.from("chats").insert(message);
+  if (error) throw error;
+}
+
+//insert picked up request 
+export async function insertPickedUpMessage(message: SystemMessageProps) {
+  const supabase = await createClient();
+  const { error } = await supabase.from("chats").insert(message);
+  if (error) throw error;
+}
+
+//insert returned message 
+export async function insertReturnedMessage(message: SystemMessageProps) {
+  const supabase = await createClient();
+  const { error } = await supabase.from("chats").insert(message);
+  if (error) throw error;
+}
+
+//insert request declined message
+export async function insertDeclineMessage(message: SystemMessageProps) {
+  const supabase = await createClient();
+  const { error } = await supabase.from("chats").insert(message);
+  if (error) throw error;
 }

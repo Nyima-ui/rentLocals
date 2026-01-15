@@ -1,133 +1,78 @@
-import { IncomingBooking } from "./types";
+import { formatSystemDate } from "@/lib/utils";
 
-interface SystemMessageProps {
-  date: string;
-  isOwner: boolean;
-  status:
-    | "requested"
-    | "booked"
-    | "in_use"
-    | "returned"
-    | "cancelled"
-    | "declined";
-}
+export type SystemAction =
+  | "requested"
+  | "booked"
+  | "in_use"
+  | "returned"
+  | "cancelled"
+  | "declined"
+  | null;
 
-
-
-export function SystemRequestMessage({
-  date,
+function SystemMessageContent({
+  action,
   isOwner,
 }: {
-  date: string;
+  action: SystemAction;
   isOwner: boolean;
 }) {
-  return (
-    <div className="bg-cyan-100 max-w-70 ml-3 my-5 px-2 py-1.5 border-l-2 border-cyan-300 text-sm">
-      <p>{date}</p>
+  if (action === "requested")
+    return (
       <p>{isOwner ? "New rental request received." : "Rental request sent."}</p>
-    </div>
-  );
-}
-
-export function SystemDeclineMessage({
-  date,
-  isOwner,
-}: {
-  date: string;
-  isOwner: boolean;
-}) {
-  return (
-    <div className="bg-cyan-100 max-w-70 ml-3 my-5 px-2 py-1.5 border-l-2 border-cyan-300 text-sm">
-      <p>{date}</p>
-      <p>
-        {isOwner
-          ? "You declined the rental request."
-          : "The owner declined your rental request."}
-      </p>
-    </div>
-  );
-}
-
-export function SystemBookedMessage({
-  date,
-  isOwner,
-}: {
-  date: string;
-  isOwner: boolean;
-}) {
-  return (
-    <div className="bg-cyan-100 max-w-70 ml-3 my-5 px-2 py-1.5 border-l-2 border-cyan-300 text-sm">
-      <p>{date}</p>
+    );
+  if (action === "booked")
+    return (
       <p>
         {isOwner
           ? "You accepted the rental request."
           : "Your rental request was accepted."}
       </p>
-    </div>
-  );
-}
-
-export function SystemInUseMessage({
-  date,
-  isOwner,
-}: {
-  date: string;
-  isOwner: boolean;
-}) {
-  return (
-    <div className="bg-cyan-100 max-w-70 ml-3 my-5 px-2 py-1.5 border-l-2 border-cyan-300 text-sm">
-      <p>{date}</p>
+    );
+  if (action === "in_use")
+    return (
       <p>
         {isOwner ? "The item has been picked up." : "You picked up the item."}
       </p>
-    </div>
-  );
-}
-
-export function SystemReturnedMessage({
-  date,
-  isOwner,
-}: {
-  date: string;
-  isOwner: boolean;
-}) {
-  return (
-    <div className="bg-cyan-100 max-w-70 ml-3 my-5 px-2 py-1.5 border-l-2 border-cyan-300 text-sm">
-      <p>{date}</p>
+    );
+  if (action === "returned")
+    return (
       <p>
         {isOwner ? "The item has been returned." : "You returned the item."}
       </p>
-    </div>
-  );
-}
-
-export function SystemCancelledMessage({
-  date,
-  isOwner,
-}: {
-  date: string;
-  isOwner: boolean;
-}) {
-  return (
-    <div className="bg-cyan-100 max-w-70 ml-3 my-5 px-2 py-1.5 border-l-2 border-cyan-300 text-sm">
-      <p>{date}</p>
+    );
+  if (action === "cancelled")
+    return (
       <p>
         {isOwner
           ? "The rental request was cancelled."
           : "You cancelled the rental request."}
       </p>
-    </div>
-  );
+    );
+  if (action === "declined")
+    return (
+      <p>
+        {isOwner
+          ? "You declined the rental request."
+          : "The owner declined your rental request."}
+      </p>
+    );
 }
 
-export function SystemMessageWrapper({ date, isOwner }: SystemMessageProps) {
+export function SystemMessage({
+  date,
+  action,
+  isOwner,
+}: {
+  date: string;
+  action: SystemAction;
+  isOwner: boolean;
+}) {
   return (
     <div className="bg-cyan-100 max-w-70 ml-3 my-5 px-2 py-1.5 border-l-2 border-cyan-300 text-sm">
-      <p>{date}</p>
-
-      <p>{isOwner ? "New rental request received." : "Rental request sent."}</p>
+      <p>{formatSystemDate(date)}</p>
+      <SystemMessageContent action={action} isOwner={isOwner} />
     </div>
   );
 }
 
-export default SystemMessageWrapper;
+export default SystemMessage;

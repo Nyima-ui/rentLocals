@@ -1,13 +1,4 @@
 "use client";
-import {
-  Card,
-  CardTitle,
-  CardDescription,
-  CardContent,
-  CardFooter,
-  CardAction,
-  CardHeader,
-} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { Avatar, AvatarImage } from "@radix-ui/react-avatar";
@@ -17,8 +8,22 @@ import BookingSummary from "./BookingSummary";
 import { approveRequest } from "./actions";
 import { useState } from "react";
 import PickupAddress from "./PickupAddress";
+import {
+  declineRequest,
+  insertApprovedMessage,
+  insertDeclineMessage,
+  insertReturnedMessage,
+} from "./hooks";
 import { confirmReturned } from "./hooks";
-import { declineRequest } from "./hooks";
+import {
+  Card,
+  CardTitle,
+  CardDescription,
+  CardContent,
+  CardFooter,
+  CardAction,
+  CardHeader,
+} from "@/components/ui/card";
 
 export function OwnerBookingInfo({
   booking,
@@ -39,6 +44,14 @@ export function OwnerBookingInfo({
         end: booking.end_date,
         pricePerDay: booking.price_per_day,
       });
+      await insertApprovedMessage({
+        sender_id: booking.renter_id,
+        receiver_id: booking.owner_id,
+        listing_id: booking.listing_id,
+        booking_id: booking.booking_id,
+        type: "system",
+        system_action: "booked",
+      });
       updateBookingStatus("booked");
       if (address) {
         setAddress(address);
@@ -55,6 +68,14 @@ export function OwnerBookingInfo({
     try {
       setIsLoading(true);
       await confirmReturned(bookingId);
+      await insertReturnedMessage({
+        sender_id: booking.owner_id,
+        receiver_id: booking.renter_id,
+        listing_id: booking.listing_id,
+        booking_id: booking.booking_id,
+        type: "system",
+        system_action: "returned",
+      });
     } catch (error) {
       console.error(`Error cofirming return: ${error}`);
     } finally {
@@ -66,6 +87,14 @@ export function OwnerBookingInfo({
     try {
       setIsLoading(true);
       await declineRequest(bookingId);
+      await insertDeclineMessage({
+        sender_id: booking.owner_id,
+        receiver_id: booking.renter_id,
+        listing_id: booking.listing_id,
+        booking_id: booking.booking_id,
+        type: "system",
+        system_action: "declined",
+      });
     } catch (err) {
       console.error(`Error declining request to rent: ${err}`);
     } finally {
@@ -115,10 +144,16 @@ export function OwnerBookingInfo({
             <p className="font-medium">You listing has been returned to you.</p>
           )}
           {booking.status === "declined" && (
-            <p className="font-medium">You declined <span>{booking.renter.first_name}&apos;s</span> request.</p>
+            <p className="font-medium">
+              You declined <span>{booking.renter.first_name}&apos;s</span>{" "}
+              request.
+            </p>
           )}
           {booking.status === "cancelled" && (
-            <p className="font-medium"><span>{booking.renter.first_name}</span> has cancelled the request.</p>
+            <p className="font-medium">
+              <span>{booking.renter.first_name}</span> has cancelled the
+              request.
+            </p>
           )}
         </div>
         <PickupAddress address={address} />

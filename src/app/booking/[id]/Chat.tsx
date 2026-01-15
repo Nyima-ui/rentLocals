@@ -2,19 +2,11 @@ import { Button } from "@/components/ui/button";
 import { Send } from "lucide-react";
 import { Field } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import {
-  SystemRequestMessage,
-  SystemDeclineMessage,
-  SystemBookedMessage,
-  SystemInUseMessage,
-  SystemReturnedMessage,
-  SystemCancelledMessage,
-} from "./SystemMessage";
+import SystemMessage from "./SystemMessage";
 
 import IncomingMessage from "./IncomingMessage";
 import OutgoingMessage from "./OutgoingMessage";
 import { IncomingBooking } from "./types";
-import { formatSystemDate } from "@/lib/utils";
 import { useAuth } from "@/context/AuthContext";
 import { getMessages, sendMessage } from "./hooks";
 import { useEffect, useRef, useState } from "react";
@@ -22,7 +14,6 @@ import { IncomingChats } from "./types";
 import { createClient } from "@/lib/supabase/client";
 
 export function Chat({ booking }: { booking: IncomingBooking }) {
-  const dateForSystemMessage = formatSystemDate(booking.created_at);
   const [messages, setMessages] = useState<IncomingChats[]>([]);
   const bottomRef = useRef<HTMLDivElement | null>(null);
   const [message, setMessage] = useState("");
@@ -97,43 +88,31 @@ export function Chat({ booking }: { booking: IncomingBooking }) {
   return (
     <div className="grow px-3 h-135 relative border rounded-md pt-3">
       <div className="h-120 overflow-y-scroll no-scrollbar pb-10">
-        <SystemRequestMessage date={dateForSystemMessage} isOwner={isOwner} />
-        {["booked", "in_use", "retired"].includes(booking.status) && (
-          <SystemBookedMessage date={dateForSystemMessage} isOwner={isOwner} />
-        )}
-        {["in_use", "returned"].includes(booking.status) && (
-          <SystemInUseMessage date={dateForSystemMessage} isOwner={isOwner} />
-        )}
-        {booking.status === "returned" && (
-          <SystemReturnedMessage
-            date={dateForSystemMessage}
-            isOwner={isOwner}
-          />
-        )}
-        {booking.status === "declined" && (
-          <SystemDeclineMessage date={dateForSystemMessage} isOwner={isOwner} />
-        )}
-        {booking.status === "cancelled" && (
-          <SystemCancelledMessage
-            date={dateForSystemMessage}
-            isOwner={isOwner}
-          />
-        )}
-        {messages.map((msg) =>
-          msg.sender_id === user?.id ? (
+        {messages.map((item) => {
+          if (item.type === "system") {
+            return (
+              <SystemMessage
+                key={item.message_id}
+                date={item.created_at}
+                action={item.system_action}
+                isOwner={isOwner}
+              />
+            );
+          }
+          return item.sender_id === user?.id ? (
             <OutgoingMessage
-              key={msg.message_id}
-              message={msg}
+              key={item.message_id}
+              message={item}
               avatar={isOwner ? booking.owner.avatar : booking.renter.avatar}
             />
           ) : (
             <IncomingMessage
-              key={msg.message_id}
-              message={msg}
+              key={item.message_id}
+              message={item}
               avatar={isOwner ? booking.renter.avatar : booking.owner.avatar}
             />
-          )
-        )}
+          );
+        })}
         <div ref={bottomRef}></div>
       </div>
 

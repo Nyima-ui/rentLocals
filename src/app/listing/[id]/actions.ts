@@ -5,6 +5,8 @@ import { notify } from "../../notifications";
 import { SupabaseClient } from "@supabase/supabase-js";
 import { bookingRequestEmail } from "@/app/emails/bookinRequest";
 import { RequestBookingActionProps } from "./types";
+import { SystemMessageProps } from "@/app/globalTypes";
+
 
 async function getBookingDetails(supabase: SupabaseClient, id: string) {
   const { data, error } = await supabase
@@ -24,6 +26,13 @@ async function getBookingDetails(supabase: SupabaseClient, id: string) {
   return bookingDetails;
 }
 
+
+export async function insertRequestMessage(message: SystemMessageProps) {
+  const supabase = await createClient();
+  const { error } = await supabase.from("chats").insert(message);
+  if (error) throw error;
+}
+
 export async function requestBookingAction({
   listingId,
   ownerId,
@@ -33,6 +42,8 @@ export async function requestBookingAction({
   pricePerDay,
 }: RequestBookingActionProps) {
   const supabase = await createClient();
+
+  //check for existing bookings
   const existingBooking = await preventDoubleBooking(
     supabase,
     listingId,
@@ -44,6 +55,7 @@ export async function requestBookingAction({
     return { bookingId: existingBooking.booking_id };
   }
 
+  //insert a new booking
   const { data: booking, error } = await supabase
     .from("bookings")
     .insert({
@@ -61,14 +73,17 @@ export async function requestBookingAction({
 
   if (error) throw error;
 
+  //get more details about the booking
   const bookingDetails = await getBookingDetails(supabase, booking.booking_id);
 
+  //get the user email
   const { data: owner } = await supabase
     .from("profiles")
     .select("email")
     .eq("user_id", ownerId)
     .single();
 
+  //send the email
   if (owner?.email) {
     await notify({
       to: "ntenzin492@gmail.com",
@@ -83,6 +98,16 @@ export async function requestBookingAction({
       }),
     });
   }
+
+  //insert request message
+  await insertRequestMessage({
+    sender_id: renterId,
+    receiver_id: ownerId,
+    listing_id: listingId,
+    booking_id: booking.booking_id,
+    type: "system",
+    system_action: "requested",
+  });
 
   return { bookingId: booking.booking_id };
 }

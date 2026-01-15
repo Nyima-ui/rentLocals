@@ -29,7 +29,7 @@ export function ListingInfo({
   const [isLoading, setIsLoading] = useState(false);
   const isOwnerOfTheListing = listing.user_id === user?.id;
 
-  async function requestBooking(e: React.FormEvent<HTMLFormElement>) {
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     if (!user || !prices) return;
     try {
@@ -70,7 +70,7 @@ export function ListingInfo({
   return (
     <div className="grow space-y-3 w-1/2 max-md:w-full">
       <h1 className="text-4xl font-medium leading-tighter">{listing?.title}</h1>
-      <form onSubmit={requestBooking}>
+      <form onSubmit={handleSubmit}>
         <FieldGroup className="flex-row">
           <Field>
             <FieldLabel htmlFor="start-date" className="text-nowrap">
