@@ -14,7 +14,7 @@ import { capitalaize } from "@/lib/utils";
 import { RenterBookingInfoProps } from "./types";
 import BookingSummary from "./BookingSummary";
 import PickupAddress from "./PickupAddress";
-import { confirmPickUp } from "./hooks";
+import { cancelRequest, confirmPickUp } from "./hooks";
 import { useState } from "react";
 
 export function RenterBookingInfo({
@@ -29,6 +29,17 @@ export function RenterBookingInfo({
       await confirmPickUp(bookingId);
     } catch (err) {
       console.error(`Error confirming pick up: ${err}`);
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  async function handleCancelRequest(bookingId: string): Promise<void> {
+    try {
+      setIsLoading(true);
+      await cancelRequest(bookingId);
+    } catch (err) {
+      console.error(`Error cancelling your request: ${err}`);
     } finally {
       setIsLoading(false);
     }
@@ -85,6 +96,16 @@ export function RenterBookingInfo({
             You have returned your rental.
           </CardDescription>
         )}
+        {booking.status === "declined" && (
+          <CardDescription className="font-medium text-base text-black mt-2 border-b-2 border-red-300">
+            <span>{booking.owner.first_name} declined your request.</span>
+          </CardDescription>
+        )}
+        {booking.status === "cancelled" && (
+          <CardDescription className="font-medium text-base text-black mt-2 border-b-2 border-red-300">
+            You have cancelled your request.
+          </CardDescription>
+        )}
         <PickupAddress address={address} />
         <div className="flex items-center gap-2 mt-7">
           <Avatar className="size-13! rounded-full overflow-hidden">
@@ -109,8 +130,13 @@ export function RenterBookingInfo({
             </Button>
           )}
           {(booking.status === "requested" || booking.status === "booked") && (
-            <Button variant="outline" className="px-3 py-5 cursor-pointer">
-              Cancel Request
+            <Button
+              variant="outline"
+              className="px-3 py-5 cursor-pointer"
+              disabled={isLoading}
+              onClick={() => handleCancelRequest(booking.booking_id)}
+            >
+              {isLoading ? "Cancelling request..." : "Cancel Request"}
             </Button>
           )}
         </CardAction>

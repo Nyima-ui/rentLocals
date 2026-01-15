@@ -38,5 +38,21 @@ export async function confirmReturned(bookingId: string): Promise<void> {
 }
 
 export async function declineRequest(bookingId: string): Promise<void> {
-  
+  const supabase = createClient();
+  const { error } = await supabase
+    .from("bookings")
+    .update({ status: "declined" })
+    .eq("booking_id", bookingId);
+
+  if (error) throw error;
+}
+
+export async function cancelRequest(bookingId: string): Promise<void> {
+  const supabase = createClient();
+  const { error } = await supabase
+    .from("bookings")
+    .update({ status: "cancelled" })
+    .eq("booking_id", bookingId);
+
+  if (error) throw error;
 }

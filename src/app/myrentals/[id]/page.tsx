@@ -71,7 +71,6 @@ const MyRentals = () => {
         setLoading(true);
         const rentals = await getOwnersRentals(userId);
         setRentals(rentals);
-        console.log(rentals);
       } catch (error) {
         console.error("Failed to fetch renter bookings:", error);
       } finally {

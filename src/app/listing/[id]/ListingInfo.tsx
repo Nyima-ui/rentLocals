@@ -26,24 +26,31 @@ export function ListingInfo({
   const [listingStatus, setListingStatus] = useState<
     "requested" | "booked" | null
   >(null);
+  const [isLoading, setIsLoading] = useState(false);
   const isOwnerOfTheListing = listing.user_id === user?.id;
 
   async function requestBooking(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     if (!user || !prices) return;
+    try {
+      setIsLoading(true);
+      const formData = new FormData(e.currentTarget);
 
-    const formData = new FormData(e.currentTarget);
+      const result = await requestBookingAction({
+        listingId: listing.listing_id,
+        ownerId: listing.user_id,
+        renterId: user.id,
+        start: formData.get("start-date") as string,
+        end: formData.get("end-date") as string,
+        pricePerDay: prices.price_day,
+      });
 
-    const result = await requestBookingAction({
-      listingId: listing.listing_id,
-      ownerId: listing.user_id,
-      renterId: user.id,
-      start: formData.get("start-date") as string,
-      end: formData.get("end-date") as string,
-      pricePerDay: prices.price_day,
-    });
-
-    router.push(`/booking/${result.bookingId}`);
+      router.push(`/booking/${result.bookingId}`);
+    } catch (err) {
+      console.error(`Error requesting a rental: ${err}`);
+    } finally {
+      setIsLoading(true);
+    }
   }
 
   useEffect(() => {
@@ -100,9 +107,9 @@ export function ListingInfo({
           <Button
             className="mt-5 cursor-pointer"
             type="submit"
-            disabled={isOwnerOfTheListing}
+            disabled={isOwnerOfTheListing || isLoading}
           >
-            Request Booking
+            {isLoading ? "Requesting..." : "Request Booking"}
           </Button>
         )}
         {listingStatus === "requested" && (

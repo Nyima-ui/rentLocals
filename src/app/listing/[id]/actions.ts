@@ -71,7 +71,7 @@ export async function requestBookingAction({
 
   if (owner?.email) {
     await notify({
-      to: owner.email,
+      to: "ntenzin492@gmail.com",
       subject: "New booking request",
       html: bookingRequestEmail({
         renter: bookingDetails.renter.first_name,

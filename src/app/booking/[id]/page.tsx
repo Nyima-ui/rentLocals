@@ -49,7 +49,7 @@ const Booking = () => {
         }
       )
       .subscribe();
-      console.log("booking status update")
+      
     return () => {
       supabase.removeChannel(channel);
     };

@@ -18,6 +18,7 @@ import { approveRequest } from "./actions";
 import { useState } from "react";
 import PickupAddress from "./PickupAddress";
 import { confirmReturned } from "./hooks";
+import { declineRequest } from "./hooks";
 
 export function OwnerBookingInfo({
   booking,
@@ -56,6 +57,17 @@ export function OwnerBookingInfo({
       await confirmReturned(bookingId);
     } catch (error) {
       console.error(`Error cofirming return: ${error}`);
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  async function handleDecline(bookingId: string): Promise<void> {
+    try {
+      setIsLoading(true);
+      await declineRequest(bookingId);
+    } catch (err) {
+      console.error(`Error declining request to rent: ${err}`);
     } finally {
       setIsLoading(false);
     }
@@ -102,6 +114,12 @@ export function OwnerBookingInfo({
           {booking.status === "returned" && (
             <p className="font-medium">You listing has been returned to you.</p>
           )}
+          {booking.status === "declined" && (
+            <p className="font-medium">You declined <span>{booking.renter.first_name}&apos;s</span> request.</p>
+          )}
+          {booking.status === "cancelled" && (
+            <p className="font-medium"><span>{booking.renter.first_name}</span> has cancelled the request.</p>
+          )}
         </div>
         <PickupAddress address={address} />
         <div className="flex items-center gap-2 mt-6">
@@ -119,14 +137,19 @@ export function OwnerBookingInfo({
       </CardContent>
       <CardFooter className="mt-5">
         <CardAction className="mx-auto">
+          {(booking.status === "booked" || booking.status === "requested") && (
+            <Button
+              variant={"outline"}
+              className="cursor-pointer py-6 mr-5"
+              disabled={isLoading}
+              onClick={() => handleDecline(booking.booking_id)}
+            >
+              {isLoading ? "Declining..." : "Decline request"}
+            </Button>
+          )}
           {booking.status === "requested" && (
             <Button className="cursor-pointer py-6" onClick={handleApprove}>
               {isLoading ? "Approving" : "Approve Request"}
-            </Button>
-          )}
-          {booking.status === "booked" && (
-            <Button variant={"outline"} className="px-3 py-5 cursor-pointer">
-              Decline request
             </Button>
           )}
           {booking.status === "in_use" && (
