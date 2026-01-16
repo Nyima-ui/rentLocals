@@ -2,7 +2,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { IncomingListing, UpdatedListing, FinalPrice } from "./types";
 import { ImageSlot } from "./types";
-import { getStoragePathFromPublicUrl } from "./utils";
+import { getStoragePathFromPublicUrl } from "@/lib/utils";
 
 export async function getListing(id: string): Promise<IncomingListing> {
   const supabase = await createClient();
