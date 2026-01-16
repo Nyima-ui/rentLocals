@@ -1,11 +1,12 @@
-import { createClient } from "@/lib/supabase/client";
-import { GetRenterBookingsProps } from "./types";
+"use server";
+import { createClient } from "@/lib/supabase/server";
+import { RentalBooking } from "./types";
 
-//better function name here
-export async function getRenterBookings(
+
+export async function getRenterSideBookings(
   renterId: string
-): Promise<GetRenterBookingsProps[]> {
-  const supabase = createClient();
+): Promise<RentalBooking[]> {
+  const supabase = await createClient();
   const { data, error } = await supabase
     .from("bookings")
     .select(
@@ -22,5 +23,5 @@ export async function getRenterBookings(
     ]);
 
   if (error) throw error;
-  return data as unknown as GetRenterBookingsProps[];
+  return data as unknown as RentalBooking[];
 }

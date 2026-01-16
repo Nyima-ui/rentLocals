@@ -1,6 +1,14 @@
-export interface GetRenterBookingsProps {
+export type BookingStatus =
+  | "requested"
+  | "booked"
+  | "declined"
+  | "cancelled"
+  | "returned"
+  | "picked";
+
+export interface RentalBooking {
   booking_id: string;
-  status: "requested" | "booked";
+  status: BookingStatus;
   listing: {
     images: string[];
     title: string;

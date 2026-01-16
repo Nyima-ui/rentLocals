@@ -35,7 +35,7 @@ const Listings = () => {
     );
   }
 
-  if (isLoading) return <p className="max-w-6xl mx-auto  mb-15">Loading...</p>;
+  if (isLoading) return <p className="max-w-6xl mx-auto mt-5 max-xl:px-5 text-2xl">Loading...</p>;
   if (listings.length === 0)
     return (
       <div className="max-w-6xl mx-auto  mb-15">
