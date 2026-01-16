@@ -1,9 +1,9 @@
 import { createClient } from "@/lib/supabase/client";
-import { GetOwnerRentalsProps } from "./types";
+import { RentalBooking } from "@/app/globalTypes";
 
 export async function getOwnersRentals(
   ownerId: string
-): Promise<GetOwnerRentalsProps[]> {
+): Promise<RentalBooking[]> {
   const supabase = createClient();
   const { data, error } = await supabase
     .from("bookings")
@@ -21,5 +21,5 @@ export async function getOwnersRentals(
     ]);
 
   if (error) throw error;
-  return data as unknown as GetOwnerRentalsProps[];
+  return data as unknown as RentalBooking[];
 }

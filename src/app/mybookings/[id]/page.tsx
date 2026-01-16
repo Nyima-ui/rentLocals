@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { getRenterSideBookings } from "./action";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
-import { RentalBooking } from "./types";
+import { RentalBooking } from "@/app/globalTypes";
 import IncomingBookingsCard from "./IncomingBookings";
 
 const MyBookings = () => {

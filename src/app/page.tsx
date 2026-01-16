@@ -78,7 +78,7 @@ export function Navbar() {
                       href={`/mybookings/${user?.id}`}
                       className="block hover:opacity-50 transition-all duration-150 ease-in"
                     >
-                      Incoming bookings
+                      My bookings
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem

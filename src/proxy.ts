@@ -35,7 +35,9 @@ export async function proxy(request: NextRequest) {
     pathname.startsWith("/listings") ||
     pathname.startsWith("/booking") ||
     pathname.startsWith("/create-listing") ||
-    pathname.startsWith("/edit-listing");
+    pathname.startsWith("/edit-listing") ||
+    pathname.startsWith("/mybookings") ||
+    pathname.startsWith("/myrentals");
 
   const { data } = await supabase.auth.getClaims();
   const user = data?.claims;

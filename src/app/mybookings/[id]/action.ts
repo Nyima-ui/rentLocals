@@ -1,6 +1,6 @@
 "use server";
 import { createClient } from "@/lib/supabase/server";
-import { RentalBooking } from "./types";
+import { RentalBooking } from "@/app/globalTypes";
 
 
 export async function getRenterSideBookings(
