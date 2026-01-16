@@ -111,3 +111,9 @@ export async function insertDeclineMessage(message: SystemMessageProps) {
   const { error } = await supabase.from("chats").insert(message);
   if (error) throw error;
 }
+//insert request declined message
+export async function insertCancelledMessage(message: SystemMessageProps) {
+  const supabase = await createClient();
+  const { error } = await supabase.from("chats").insert(message);
+  if (error) throw error;
+}

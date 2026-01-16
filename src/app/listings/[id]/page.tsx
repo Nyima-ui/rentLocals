@@ -21,7 +21,7 @@ import {
   DialogContent,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { getStoragePathFromPublicUrl } from "@/app/edit-listing/[id]/page";
+import { getStoragePathFromPublicUrl } from "./hooks";
 
 interface MyListingCardProps {
   listing: Listing;
