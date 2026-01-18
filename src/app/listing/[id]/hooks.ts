@@ -25,7 +25,7 @@ export async function getPrices(id: string): Promise<IncomingPrices | null> {
 }
 
 export async function getOwnerProfile(
-  ownerId: string
+  ownerId: string,
 ): Promise<OwnerProfile | null> {
   const { data } = await supabase
     .from("profiles")
@@ -66,4 +66,11 @@ export async function checkIfBookedByTheSameRenter({
     return "booked";
   }
   return null;
+}
+
+export function dateToYMD(date: Date): string {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
 }

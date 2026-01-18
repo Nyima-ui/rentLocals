@@ -12,7 +12,13 @@ import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
 import { requestBookingAction } from "./actions";
 import { useEffect, useState } from "react";
-import { checkIfBookedByTheSameRenter } from "./hooks";
+import { checkIfBookedByTheSameRenter, dateToYMD } from "./hooks";
+import { type DateRange } from "react-day-picker";
+
+import dynamic from "next/dynamic";
+const CalendarClient = dynamic(() => import("@/components/calendar-06"), {
+  ssr: false,
+});
 
 export function ListingInfo({
   listing,
@@ -26,22 +32,38 @@ export function ListingInfo({
   const [listingStatus, setListingStatus] = useState<
     "requested" | "booked" | null
   >(null);
+  const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
   const [isLoading, setIsLoading] = useState(false);
   const isOwnerOfTheListing = listing.user_id === user?.id;
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     if (!user || !prices) return;
+    if (!dateRange) {
+      alert("Please pick a date to book");
+      return;
+    }
+    const { from, to } = dateRange;
+    if (!from || !to) {
+      alert("Please select a start and end date");
+      return;
+    }
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    if (from < today || to < today) {
+      alert("Invalid date. You cannot book pass dates.");
+      return;
+    }
     try {
       setIsLoading(true);
-      const formData = new FormData(e.currentTarget);
-
       const result = await requestBookingAction({
         listingId: listing.listing_id,
         ownerId: listing.user_id,
         renterId: user.id,
-        start: formData.get("start-date") as string,
-        end: formData.get("end-date") as string,
+        start: dateToYMD(from),
+        end: dateToYMD(to),
         pricePerDay: prices.price_day,
       });
 
@@ -67,36 +89,15 @@ export function ListingInfo({
     checkIsBookedOrRequested();
   }, [listing.listing_id, user?.id, listing.user_id]);
 
+  useEffect(() => {
+    console.log(dateRange);
+  }, [dateRange]);
+
   return (
     <div className="grow space-y-3 w-1/2 max-md:w-full">
       <h1 className="text-4xl font-medium leading-tighter">{listing?.title}</h1>
       <form onSubmit={handleSubmit}>
-        <FieldGroup className="flex-row mt-4">
-          <Field>
-            <FieldLabel htmlFor="start-date" className="text-nowrap text-base">
-              Start date:
-            </FieldLabel>
-            <Input
-              type="date"
-              id="start-date"
-              name="start-date"
-              required
-              className="max-w-50 cursor-pointer"
-            />
-          </Field>
-          <Field>
-            <FieldLabel htmlFor="end-date" className="text-nowrap text-base">
-              End date:
-            </FieldLabel>
-            <Input
-              type="date"
-              id="end-date"
-              name="end-date"
-              required
-              className="max-w-50 cursor-pointer"
-            />
-          </Field>
-        </FieldGroup>
+        <CalendarClient dateRange={dateRange} setDateRange={setDateRange} />
         <div className="mt-10">
           <FieldTitle className="text-3xl">{`$${prices?.price_day}`}</FieldTitle>
           <FieldDescription className="mt-2!">Price for 1 day</FieldDescription>
@@ -164,3 +165,30 @@ export function ListingInfo({
 }
 
 export default ListingInfo;
+
+{
+  /* <Field>
+            <FieldLabel htmlFor="start-date" className="text-nowrap text-base">
+              Start date:
+            </FieldLabel>
+            <Input
+              type="date"
+              id="start-date"
+              name="start-date"
+              required
+              className="max-w-50 cursor-pointer"
+            />
+          </Field>
+          <Field>
+            <FieldLabel htmlFor="end-date" className="text-nowrap text-base">
+              End date:
+            </FieldLabel>
+            <Input
+              type="date"
+              id="end-date"
+              name="end-date"
+              required
+              className="max-w-50 cursor-pointer"
+            />
+          </Field> */
+}
