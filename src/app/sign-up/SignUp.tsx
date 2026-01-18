@@ -22,6 +22,7 @@ const SignUp = ({
   const [isVerifying, setIsVerifying] = useState(false);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const [profilePicture, setProfilePicture] = useState<File | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
   function handleAvatarChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -37,6 +38,7 @@ const SignUp = ({
     const form = e.currentTarget;
     const formData = new FormData(form);
     try {
+      setIsLoading(true);
       const email = formData.get("email") as string;
       const password = formData.get("password") as string;
       const phone = formData.get("phone") as string;
@@ -61,6 +63,8 @@ const SignUp = ({
       router.push("/");
     } catch (err) {
       console.error(`Error signing up: ${(err as Error).message}`);
+    } finally {
+      setIsLoading(false);
     }
   }
   return (
@@ -166,8 +170,12 @@ const SignUp = ({
 
                 <FieldGroup>
                   <Field>
-                    <Button type="submit" className="cursor-pointer">
-                      Create Account
+                    <Button
+                      type="submit"
+                      className="cursor-pointer"
+                      disabled={isLoading}
+                    >
+                      {isLoading ? "Creating..." : "Create Account"}
                     </Button>
                     <Button variant="outline" type="button">
                       Sign up with Google

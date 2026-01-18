@@ -29,10 +29,10 @@ export function MyListingCard({ listing, onDelete }: MyListingCardProps) {
   return (
     <li className="max-w-55">
       <Card className="p-0 overflow-hidden gap-2 pb-3">
-        <CardHeader className="p-0 ">
+        <CardHeader className="p-0">
           <div className="bg-gray-400 h-43.75 relative">
             <Image
-              src={listing.images[0] ?? ""}
+              src={listing.images?.[0] ?? "https://placehold.co/600x400"}
               alt={listing.title}
               fill
               sizes="30"
@@ -55,7 +55,7 @@ export function MyListingCard({ listing, onDelete }: MyListingCardProps) {
           </div>
           <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-              <Button className="bg-red-600/95 hover:bg-red-500 w-full cursor-pointer">
+              <Button className="w-full cursor-pointer">
                 Delete
               </Button>
             </DialogTrigger>
@@ -76,7 +76,7 @@ export function MyListingCard({ listing, onDelete }: MyListingCardProps) {
                   Cancel
                 </Button>
                 <Button
-                  className="bg-red-600/95 hover:bg-red-500 cursor-pointer"
+                  className="cursor-pointer"
                   onClick={async () => {
                     await onDelete(listing.listing_id);
                     setOpen(false);

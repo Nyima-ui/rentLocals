@@ -8,7 +8,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { signInUser } from "./action";
-import { SetStateAction } from "react";
+import { SetStateAction, useState } from "react";
 import { useRouter } from "next/navigation";
 
 const SignIn = ({
@@ -17,16 +17,19 @@ const SignIn = ({
   toggleSignUp: React.Dispatch<SetStateAction<boolean>>;
 }) => {
   const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
     try {
+      setIsLoading(true);
       const email = formData.get("email") as string;
       const password = formData.get("password") as string;
       await signInUser({ email, password });
       router.push("/");
     } catch (err) {
       console.error(`Error signing in ${(err as Error).message}`);
+      setIsLoading(false);
     }
   }
   return (
@@ -57,8 +60,12 @@ const SignIn = ({
 
               <FieldGroup>
                 <Field>
-                  <Button type="submit" className="cursor-pointer">
-                    Sign in
+                  <Button
+                    type="submit"
+                    className="cursor-pointer"
+                    disabled={isLoading}
+                  >
+                    {isLoading ? "Signing in..." : "Sign in"}
                   </Button>
                   <Button variant="outline" type="button">
                     Sign in with Google

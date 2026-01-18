@@ -38,9 +38,9 @@ const Listings = () => {
   if (isLoading) return <p className="max-w-6xl mx-auto mt-5 max-xl:px-5 text-2xl">Loading...</p>;
   if (listings.length === 0)
     return (
-      <div className="max-w-6xl mx-auto  mb-15">
-        <h1 className="text-2xl my-7">No listings yet</h1>
-        <Button asChild>
+      <div className="max-w-6xl mx-auto mb-15 max-xl:px-5">
+        <h1 className="text-lg mt-7">No listings yet</h1>
+        <Button asChild className="mt-3">
           <Link href="/create-listing">Create listing</Link>
         </Button>
       </div>

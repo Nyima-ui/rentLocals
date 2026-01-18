@@ -1,5 +1,5 @@
 "use client";
-import { SearchBox } from "@/app/page";
+import Searchbar from "@/components/own/Searchbar";
 import { useState, useEffect } from "react";
 import { Listing as ListingType, IncomingPrices } from "./types";
 import ListingImage from "./ListingImage";
@@ -26,9 +26,9 @@ const Listing = () => {
 
   return (
     <section>
-      <SearchBox />
+      <Searchbar />
       <section className="max-w-6xl mx-auto my-10  max-xl:px-5">
-        <div className="flex gap-5 max-md:flex-col justify-between">
+        <div className="flex gap-10 max-md:flex-col justify-between">
           <ListingImage listing={listing} />
           <ListingInfo listing={listing} prices={prices} />
         </div>

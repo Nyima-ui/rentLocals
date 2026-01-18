@@ -1,11 +1,12 @@
-"use server";
-import { createClient } from "@/lib/supabase/server";
+// import { createClient } from "@/lib/supabase/server";
+import { createClient } from "@/lib/supabase/client";
 
 export async function uploadProfilePicture(
   file: File,
-  firstName: string
+  firstName: string,
 ): Promise<string | null> {
-  const supabase = await createClient();
+  // const supabase = await createClient();
+  const supabase = createClient();
   const filePath = `${firstName}-${Date.now()}`;
 
   const { error } = await supabase.storage
@@ -31,7 +32,8 @@ export interface NewUserDetails {
 }
 
 export async function signUpUser(userDetails: NewUserDetails) {
-  const supabase = await createClient();
+  // const supabase = await createClient();
+  const supabase = createClient();
   const { data, error } = await supabase.auth.signUp({
     email: userDetails.email,
     password: userDetails.password,
@@ -54,7 +56,8 @@ export interface UserDetails {
 }
 
 export async function signInUser(userDetails: UserDetails) {
-  const supabase = await createClient();
+  // const supabase = await createClient();
+  const supabase = createClient();
   const { error } = await supabase.auth.signInWithPassword({
     email: userDetails.email,
     password: userDetails.password,

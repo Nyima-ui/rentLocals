@@ -1,6 +1,6 @@
 "use client";
 import Chat from "./Chat";
-import { SearchBox } from "../../page";
+import Searchbar from "@/components/own/Searchbar";
 import { IncomingBooking } from "./types";
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
@@ -74,7 +74,7 @@ const Booking = () => {
       : null;
   return (
     <section className="max-w-6xl mx-auto max-xl:px-5 mb-15">
-      <SearchBox />
+      <Searchbar />
       <div className="mt-17 flex justify-between max-md:flex-col gap-5">
         {role === "renter" && (
           <RenterBookingInfo booking={booking} address={address} />

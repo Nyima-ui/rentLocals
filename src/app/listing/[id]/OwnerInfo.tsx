@@ -1,5 +1,11 @@
 "use client";
-import { Card, CardTitle, CardAction, CardContent } from "@/components/ui/card";
+import {
+  Card,
+  CardTitle,
+  CardAction,
+  CardContent,
+  CardDescription,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage } from "@radix-ui/react-avatar";
 import { OwnerProfile, Listing } from "./types";
@@ -8,17 +14,25 @@ import { useEffect, useState } from "react";
 
 export function OwnerInfo({ listing }: { listing: Listing }) {
   const [owner, setOwner] = useState<OwnerProfile | null>(null);
+  const [chat, setChat] = useState(false);
 
   useEffect(() => {
     getOwnerProfile(listing.user_id).then(setOwner);
   }, [listing.user_id]);
 
-  if(!owner) return null
+  function handleOpenChat() {
+    setChat(true);
+    setTimeout(() => {
+      setChat(false);
+    }, 10000);
+  }
+
+  if (!owner) return null;
 
   return (
     <Card className="flex flex-row items-start max-lg:flex-col mt-10 justify-between bg-transparent border-none shadow-none">
-      <div className="flex items-start max-md:flex-col max-md:gap-5">
-        <div className="flex items-center">
+      <div className="flex items-start max-md:flex-col max-md:gap-10 w-full">
+        <div className="flex items-center min-w-[55%]">
           <Avatar>
             <AvatarImage
               src={owner?.avatar}
@@ -31,25 +45,29 @@ export function OwnerInfo({ listing }: { listing: Listing }) {
               Owned by {owner?.first_name} {owner?.last_name}
             </CardTitle>
             <CardAction className="mt-3">
-              <Button>Message</Button>
+              <Button className="cursor-pointer" onClick={handleOpenChat}>
+                Message
+              </Button>
             </CardAction>
+            {chat && (
+              <CardDescription className="max-w-50 mt-5">
+                You have to request a booking before chatting.
+              </CardDescription>
+            )}
           </CardContent>
         </div>
-        <div className="">
-          <p className="mb-3 font-medium">Approximate location:</p>
+        <div>
+          <p className="text-lg font-medium">Approximate location:</p>
           <iframe
             src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1472086.7749927582!2d-80.61774836557551!3d43.893756423188556!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x882b2a1d7471156d%3A0x4ecad8e272e4c2a2!2sGreater%20Toronto%20Area%2C%20ON%2C%20Canada!5e0!3m2!1sen!2sin!4v1767149734066!5m2!1sen!2sin"
             width="400"
             height="350"
             loading="lazy"
             referrerPolicy="no-referrer-when-downgrade"
+            className="rounded-md mt-5"
           ></iframe>
         </div>
       </div>
-      <p className="max-w-md max-xl:max-w-sm">
-        <span className="text-base block font-semibold">About the item:</span>
-        {listing?.description}
-      </p>
     </Card>
   );
 }
