@@ -99,7 +99,7 @@ export function ListingInfo({
         </FieldGroup>
         <div className="mt-10">
           <FieldTitle className="text-3xl">{`$${prices?.price_day}`}</FieldTitle>
-          <FieldDescription>Price for 1 day</FieldDescription>
+          <FieldDescription className="mt-2!">Price for 1 day</FieldDescription>
         </div>
         {!user && (
           <Button

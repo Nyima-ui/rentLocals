@@ -32,15 +32,14 @@ const MyRentals = () => {
   return (
     <div className="max-w-6xl mx-auto max-xl:px-5">
       <h1 className="text-3xl">Your current rentals</h1>
-
       {loading ? (
         <p className="text-lg mt-5">Loading...</p>
       ) : rentals.length === 0 ? (
-        <p className="text-gray-800 font-medium mt-5 text-lg">
+        <p className="font-medium mt-5 text-lg">
           You do not have any listings rented yet.
         </p>
       ) : (
-        <ul className="grid mt-7 grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-3 max-xl:px-5">
+        <ul className="flex gap-5 mt-10 flex-wrap">
           {rentals.map((rental) => (
             <RentalCard key={rental.booking_id} rental={rental} />
           ))}
@@ -51,3 +50,4 @@ const MyRentals = () => {
 };
 
 export default MyRentals;
+// grid mt-7 grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-3 max-xl:px-5

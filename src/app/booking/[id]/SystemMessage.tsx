@@ -68,7 +68,7 @@ export function SystemMessage({
   isOwner: boolean;
 }) {
   return (
-    <div className="bg-cyan-100 max-w-70 ml-3 my-5 px-2 py-1.5 border-l-2 border-cyan-300 text-sm">
+    <div className="bg-card rounded-r-md max-w-70 ml-3 my-5 px-2 py-1.5 border-l-2 border-primary text-sm">
       <p>{formatSystemDate(date)}</p>
       <SystemMessageContent action={action} isOwner={isOwner} />
     </div>

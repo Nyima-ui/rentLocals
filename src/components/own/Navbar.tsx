@@ -25,15 +25,14 @@ const Navbar = () => {
     // <Navar2 />
     <header className="max-w-6xl mx-auto max-xl:px-5">
       <nav className="flex justify-between items-center py-4">
-        <Link href="/">LOGO</Link>
+        <Link href="/">
+          <Image src={"/logo.svg"} alt="home page" height={0} width={110} />
+        </Link>
         <ul className="flex items-center gap-3 relative">
-          <li>
+          <li className="mt-1">
             {user ? (
-              <DropdownMenu
-                open={open}
-                onOpenChange={setOpen}
-              >
-                <DropdownMenuTrigger>
+              <DropdownMenu open={open} onOpenChange={setOpen}>
+                <DropdownMenuTrigger className="rounded-full">
                   <Avatar className="size-11! overflow-hidden flex items-center justify-center rounded-[100px] cursor-pointer">
                     <AvatarImage
                       src={user?.user_metadata?.avatar}
@@ -46,21 +45,15 @@ const Navbar = () => {
                     My Account
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem
-                    onSelect={() => setOpen(false)}
-                    asChild
-                  >
+                  <DropdownMenuItem onSelect={() => setOpen(false)} asChild>
                     <Link
                       href={`/listings/${user?.id}`}
                       className="hover:opacity-50 transition-all duration-150 ease-in"
                     >
-                       My listings
+                      My listings
                     </Link>
                   </DropdownMenuItem>
-                  <DropdownMenuItem
-                    onSelect={() => setOpen(false)}
-                    asChild
-                  >
+                  <DropdownMenuItem onSelect={() => setOpen(false)} asChild>
                     <Link
                       href={`/mybookings/${user?.id}`}
                       className="block hover:opacity-50 transition-all duration-150 ease-in"
@@ -68,15 +61,12 @@ const Navbar = () => {
                       My bookings
                     </Link>
                   </DropdownMenuItem>
-                  <DropdownMenuItem
-                    onSelect={() => setOpen(false)}
-                    asChild
-                  >
+                  <DropdownMenuItem onSelect={() => setOpen(false)} asChild>
                     <Link
                       href={`/myrentals/${user?.id}`}
                       className="block hover:opacity-50 transition-all duration-150 ease-in"
                     >
-                      My rentals  
+                      My rentals
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem

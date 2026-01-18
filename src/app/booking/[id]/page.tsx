@@ -75,7 +75,7 @@ const Booking = () => {
   return (
     <section className="max-w-6xl mx-auto max-xl:px-5 mb-15">
       <Searchbar />
-      <div className="mt-17 flex justify-between max-md:flex-col gap-5">
+      <div className="mt-10 flex justify-between max-md:flex-col gap-5">
         {role === "renter" && (
           <RenterBookingInfo booking={booking} address={address} />
         )}

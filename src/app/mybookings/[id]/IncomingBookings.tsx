@@ -33,14 +33,14 @@ const IncomingBookingsCard = ({ booking }: { booking: RentalBooking }) => {
               ${booking.price.price_day}/day
             </p>
           </CardContent>
-          <CardFooter className="px-2 flex-col gap-3">
+          <CardFooter className="px-2 flex-col gap-3 mt-3">
             <div className="flex w-full gap-3">
-              <Button className="grow bg-sky-500 hover:bg-sky-600 cursor-pointer">
+              <Button className="grow cursor-pointer">
                 View booking
               </Button>
             </div>
           </CardFooter>
-          <span className="absolute text-white bg-gray-500 right-2 top-2 p-1 rounded-md">
+          <span className="absolute text-white bg-accent right-2 top-2 p-1 rounded-md">
             {capitalaize(booking.status)}
           </span>
         </Card>

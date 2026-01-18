@@ -72,7 +72,7 @@ export function RenterBookingInfo({
           Bookign ID:{" "}
           <span className="font-normal text-sm">{booking.booking_id}</span>
         </CardTitle>
-        <CardDescription className="font-medium text-base">
+        <CardDescription className="font-medium text-base text-white mt-2">
           Status: {capitalaize(booking.status)}
         </CardDescription>
       </CardHeader>
@@ -88,42 +88,42 @@ export function RenterBookingInfo({
         {/* pick up address  */}
         {(booking.status === "booked" || booking.status === "in_use") && (
           <>
-            <CardDescription className="text-black text-base mt-3 border-b-2 border-red-300 font-medium pb-1">
-              <span className="cursor-pointer text-sky-500">
+            <CardDescription className="text-base mt-3 border-b-2 border-red-300 font-medium pb-1">
+              <span className="cursor-pointer text-accent">
                 {booking.owner.first_name}
               </span>{" "}
               accepted your request to rent{" "}
               <span className="text-blue-500">{booking.listings.title}</span>
             </CardDescription>
-            <CardDescription className="text-black text-base mt-2">
+            <CardDescription className="text-white text-base mt-2">
               Below is the pick up location.
             </CardDescription>
           </>
         )}
         {booking.status === "requested" && (
           <CardDescription>
-            <p className="text-[15px] text-black mt-3">
+            <p className="text-[15px] text-white mt-3">
               Your request to rent{" "}
-              <span className="text-blue-600">{booking.listings.title}</span>{" "}
-              has been sent to{" "}
+              <span className="text-primary">{booking.listings.title}</span> has
+              been sent to{" "}
               <span className="cursor-pointer underline">
-                {booking.owner.first_name}
+                {booking.owner.first_name}.
               </span>
             </p>
           </CardDescription>
         )}
         {booking.status === "returned" && (
-          <CardDescription className="font-medium text-base text-black mt-2 border-b-2 border-red-300">
+          <CardDescription className="font-medium text-base text-white mt-2 border-b-2 border-accent max-w-sm">
             You have returned your rental.
           </CardDescription>
         )}
         {booking.status === "declined" && (
-          <CardDescription className="font-medium text-base text-black mt-2 border-b-2 border-red-300">
+          <CardDescription className="font-medium text-base text-white mt-2 border-b-2 border-accent max-w-sm">
             <span>{booking.owner.first_name} declined your request.</span>
           </CardDescription>
         )}
         {booking.status === "cancelled" && (
-          <CardDescription className="font-medium text-base text-black mt-2 border-b-2 border-red-300">
+          <CardDescription className="font-medium text-base text-white mt-2 border-b-2 border-accent max-w-sm">
             You have cancelled your request.
           </CardDescription>
         )}
@@ -132,7 +132,7 @@ export function RenterBookingInfo({
           <Avatar className="size-13! rounded-full overflow-hidden">
             <AvatarImage src={booking.owner.avatar} className="object-cover" />
           </Avatar>
-          <CardDescription className="text-black text-lg">
+          <CardDescription className="text-white text-lg">
             {booking.owner.first_name} {booking.owner.last_name}
           </CardDescription>
         </div>
@@ -153,7 +153,7 @@ export function RenterBookingInfo({
           {(booking.status === "requested" || booking.status === "booked") && (
             <Button
               variant="outline"
-              className="px-3 py-5 cursor-pointer"
+              className="px-3 py-5 cursor-pointer mt-3"
               disabled={isLoading}
               onClick={() => handleCancelRequest(booking.booking_id)}
             >

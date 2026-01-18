@@ -15,7 +15,7 @@ function IncomingMessage({
           <AvatarImage src={avatar} className="size-12 rounded-[100px]" />
         </Avatar>
       </div>
-      <div className="text-sm bg-gray-600 text-white max-w-70 rounded-b-lg px-2 py-1 rounded-tr-lg mt-7">
+      <div className="text-sm bg-accent text-white max-w-70 rounded-b-lg px-2 py-1 rounded-tr-lg mt-7">
         {message.message}
       </div>
     </div>

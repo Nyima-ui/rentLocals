@@ -103,13 +103,13 @@ export function OwnerBookingInfo({
   }
 
   return (
-    <Card className="bg-transparent shadow-none min-w-1/2 gap-0">
+    <Card className="bg-transparent shadow-none min-w-1/2 gap-0 rounded-md">
       <CardHeader>
         <CardTitle>
           Bookign ID:{" "}
           <span className="font-normal text-sm">{booking.booking_id}</span>
         </CardTitle>
-        <CardDescription className="font-medium text-base">
+        <CardDescription className="font-medium text-base text-white mt-2">
           Status: {capitalaize(booking.status)}
         </CardDescription>
       </CardHeader>
@@ -122,10 +122,10 @@ export function OwnerBookingInfo({
             {booking.listings.title}
           </Link>
         </CardTitle>
-        <div className="border-b-2 border-red-300 pb-1.5 mt-3 max-w-md">
+        <div className="border-b-2 border-accent pb-1.5 mt-3 max-w-sm">
           {booking.status === "requested" && (
             <p>
-              <Link href="#" className="text-blue-600">
+              <Link href="#" className="text-primary">
                 {booking.renter.first_name} {booking.renter.last_name}
               </Link>{" "}
               has requested to rent your listing.
@@ -134,7 +134,7 @@ export function OwnerBookingInfo({
           {(booking.status === "booked" || booking.status === "in_use") && (
             <p className="font-medium">
               You accepted{" "}
-              <Link href="#" className="text-blue-600">
+              <Link href="#" className="text-primary">
                 {booking.renter.first_name} {booking.renter.last_name}
               </Link>{" "}
               requests to rent your listing.
@@ -164,13 +164,13 @@ export function OwnerBookingInfo({
               className="size-12 rounded-[100px]"
             />
           </Avatar>
-          <CardDescription className="text-black text-[17px]">
+          <CardDescription className="text-[17px] text-white">
             {booking.renter.first_name} {booking.renter.last_name}
           </CardDescription>
         </div>
         <BookingSummary booking={booking} />
       </CardContent>
-      <CardFooter className="mt-5">
+      <CardFooter className="mt-7">
         <CardAction className="mx-auto">
           {(booking.status === "booked" || booking.status === "requested") && (
             <Button

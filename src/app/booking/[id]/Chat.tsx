@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Send } from "lucide-react";
+import { Icon, Send } from "lucide-react";
 import { Field } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import SystemMessage from "./SystemMessage";
@@ -72,7 +72,7 @@ export function Chat({ booking }: { booking: IncomingBooking }) {
         },
         (payload) => {
           setMessages((prev) => [...prev, payload.new as IncomingChats]);
-        }
+        },
       )
       .subscribe();
 
@@ -86,7 +86,7 @@ export function Chat({ booking }: { booking: IncomingBooking }) {
   }, [messages]);
 
   return (
-    <div className="grow px-3 h-135 relative border rounded-md pt-3">
+    <div className="grow px-3 relative border rounded-md pt-3 min-h-135">
       <div className="h-120 overflow-y-scroll no-scrollbar pb-10">
         {messages.map((item) => {
           if (item.type === "system") {
@@ -117,7 +117,7 @@ export function Chat({ booking }: { booking: IncomingBooking }) {
       </div>
 
       <form
-        className="flex items-center justify-between absolute w-[95%] bottom-0.5"
+        className="flex items-center justify-between absolute w-[95%] bottom-2 max-md:fixed max-md:bottom-3 max-md:w-[90%]"
         onSubmit={handleSubmit}
       >
         <Field className="flex-row">
@@ -126,13 +126,17 @@ export function Chat({ booking }: { booking: IncomingBooking }) {
             placeholder={`Message to ${
               isOwner ? booking.renter.first_name : booking.owner.first_name
             }`}
-            className="grow px-3 py-2 rounded-4xl border text-wrap"
+            className="grow px-3 py-2 rounded-4xl border text-wrap max-md:bg-card!"
             value={message}
             onChange={(e) => setMessage(e.target.value)}
             disabled={isLoading}
             name="outgoing-message"
           />
-          <Button type="submit" className="max-w-10 cursor-pointer">
+          <Button
+            type="submit"
+            className="max-w-10 cursor-pointer"
+            size={"icon"}
+          >
             <Send />
           </Button>
         </Field>

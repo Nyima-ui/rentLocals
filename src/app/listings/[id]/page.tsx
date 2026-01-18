@@ -49,7 +49,7 @@ const Listings = () => {
   return (
     <section className="max-w-6xl mx-auto  mb-15">
       <h1 className="text-3xl max-xl:px-5">Your listings</h1>
-      <ul className="grid mt-7 grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-3 max-xl:px-5">
+      <ul className="flex gap-5 mt-10 flex-wrap">
         {listings.map((item) => (
           <MyListingCard
             key={item.listing_id}
@@ -63,3 +63,4 @@ const Listings = () => {
 };
 
 export default Listings;
+// grid mt-7 grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-3 max-xl:px-5

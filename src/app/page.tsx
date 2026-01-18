@@ -5,7 +5,6 @@ import { getListingsForHome } from "./action";
 import { Listing } from "./globalTypes";
 import Searchbar from "@/components/own/Searchbar";
 import HomeListingCard from "@/components/own/HomeListingCard";
-import "leaflet/dist/leaflet.css";
 
 export default function Home() {
   const [listings, setListings] = useState<Listing[]>([]);

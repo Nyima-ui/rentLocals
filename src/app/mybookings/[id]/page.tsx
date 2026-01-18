@@ -39,7 +39,7 @@ const MyBookings = () => {
           You have not rented any items yet.
         </p>
       ) : (
-        <ul className="grid mt-7 grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-3 max-xl:px-5">
+        <ul className="flex gap-5 mt-10 flex-wrap">
           {myBookings.map((booking) => (
             <IncomingBookingsCard key={booking.booking_id} booking={booking} />
           ))}
@@ -50,3 +50,4 @@ const MyBookings = () => {
 };
 
 export default MyBookings;
+// grid mt-7 grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-3 max-xl:px-5

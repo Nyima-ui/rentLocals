@@ -10,7 +10,7 @@ function OutgoingMessage({
 }) {
   return (
     <div className="flex gap-3 mt-5 justify-end">
-      <div className="text-sm bg-gray-600 text-white max-w-70 rounded-b-lg px-2 py-1 rounded-tl-lg mt-7">
+      <div className="text-sm bg-accent text-white max-w-70 rounded-b-lg px-2 py-1 rounded-tl-lg mt-7">
         {message.message}
       </div>
       <div>
