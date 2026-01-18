@@ -32,7 +32,6 @@ export interface NewUserDetails {
 }
 
 export async function signUpUser(userDetails: NewUserDetails) {
-  // const supabase = await createClient();
   const supabase = createClient();
   const { data, error } = await supabase.auth.signUp({
     email: userDetails.email,

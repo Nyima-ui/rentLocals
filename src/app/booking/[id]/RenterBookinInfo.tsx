@@ -88,12 +88,12 @@ export function RenterBookingInfo({
         {/* pick up address  */}
         {(booking.status === "booked" || booking.status === "in_use") && (
           <>
-            <CardDescription className="text-base mt-3 border-b-2 border-accent font-medium pb-1 max-w-sm">
-              <span className="cursor-pointer text-accent">
+            <CardDescription className="text-base mt-3 border-b-2 border-accent font-medium pb-1 max-w-sm text-white">
+              <span className="cursor-pointer text-primary">
                 {booking.owner.first_name}
               </span>{" "}
               accepted your request to rent{" "}
-              <span className="text-primary">{booking.listings.title}</span>
+              <span>{booking.listings.title}</span>
             </CardDescription>
             <CardDescription className="text-white text-base mt-2">
               Below is the pick up location.

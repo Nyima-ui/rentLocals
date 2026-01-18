@@ -21,7 +21,7 @@ export default function Calendar06({
         defaultMonth={dateRange?.from}
         selected={dateRange}
         onSelect={setDateRange}
-        numberOfMonths={1}
+        numberOfMonths={2}
         min={1}
         className="rounded-lg border shadow-sm"
       />

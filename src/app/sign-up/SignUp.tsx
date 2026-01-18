@@ -1,6 +1,12 @@
 import { User } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import {
   Field,
   FieldDescription,
@@ -70,10 +76,27 @@ const SignUp = ({
   return (
     <main className="h-auto w-screen flex justify-center items-center py-10">
       {isVerifying ? (
-        <Card className="min-w-md">
+        <Card className="max-w-lg mt-10">
           <CardHeader>
-            <CardTitle>Please check your Email</CardTitle>
+            <CardTitle>Check your email</CardTitle>
           </CardHeader>
+          <CardContent>
+            <CardDescription className="">
+              If this email isn&apos;t already registered, we&apos;ve sent you a
+              verification link. Please check your inbox and click the link to
+              activate your account.
+            </CardDescription>
+            <CardDescription className="mt-4">
+              If you already have an account, please{" "}
+              <button
+                onClick={() => toggleSignIn(true)}
+                className="text-primary underline cursor-pointer"
+              >
+                sign in instead
+              </button>
+              .
+            </CardDescription>
+          </CardContent>
         </Card>
       ) : (
         <Card className="min-w-md">
