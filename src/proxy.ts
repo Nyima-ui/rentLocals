@@ -39,8 +39,8 @@ export async function proxy(request: NextRequest) {
     pathname.startsWith("/mybookings") ||
     pathname.startsWith("/myrentals");
 
-  const { data } = await supabase.auth.getClaims();
-  const user = data?.claims;
+  const { data } = await supabase.auth.getUser();
+  const user = data?.user;
 
   if (isProtectedRoute && !user) {
     const url = request.nextUrl.clone();
