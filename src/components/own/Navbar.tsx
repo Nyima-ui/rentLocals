@@ -72,8 +72,10 @@ const Navbar = () => {
                   <DropdownMenuItem
                     onSelect={async () => {
                       await supabase.auth.signOut();
+                      // await supabase.auth.refreshSession();
                       setOpen(false);
                       router.push("/");
+                      router.refresh()
                     }}
                     asChild
                     className="cursor-pointer block hover:opacity-50 transition-all duration-150 ease-in"
