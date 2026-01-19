@@ -1,36 +1,73 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+## 📌 About the Project
 
-## Getting Started
+**RentLocals** is a personal full-stack project built by me, **Tenzin Nyima**.
 
-First, run the development server:
+It’s a **rental marketplace** where people can rent items they don’t use often but are expensive to buy — locally, from real people.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+---
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 💡 What Problem Does It Solve?
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- Buying expensive items for short-term use doesn’t make sense
+- Many people already own these items but rarely use them
+- RentLocals connects **owners** and **renters** in the same community
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+---
 
-## Learn More
+## ✨ Core Features
 
-To learn more about Next.js, take a look at the following resources:
+### 👤 Users
+- Create an account
+- Authenticate securely
+- Manage their own listings
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### 📦 Listings (CRUD)
+- Create listings
+- Read / browse listings
+- Update listing details
+- Delete listings
+- Add:
+  - Title
+  - Description
+  - Images
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### 📅 Bookings
+- Renters can request a booking
+- Select a **from → to** date range
+- One-click **“Request Booking”** flow
 
-## Deploy on Vercel
+### 💬 Chat & Coordination
+- Dedicated chat page after booking request
+- Real-time communication between renter & owner
+- View booking status
+- Decide pickup location
+- Payments handled **offline**
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### 📧 Notifications
+- Email notifications when:
+  - A booking is requested
+  - An owner accepts a booking request
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
+
+## 🧠 Why I Built This
+
+- To solve a **real-world problem**
+- To practice **full-stack development**
+- To work with:
+  - Authentication
+  - CRUD operations
+  - Bookings logic
+  - Real-time chat
+  - Email notifications
+- To build a **product**, not just a UI demo
+
+---
+
+## 🚧 Project Status
+
+This project is actively evolving and will continue to improve with:
+- Better search & filters
+- Payments integration
+- User profiles
+- Booking management improvements
