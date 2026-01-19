@@ -1,12 +1,5 @@
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import {
-  Field,
-  FieldGroup,
-  FieldLabel,
-  FieldTitle,
-  FieldDescription,
-} from "@/components/ui/field";
+import { FieldTitle, FieldDescription } from "@/components/ui/field";
 import { Listing, IncomingPrices } from "./types";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
@@ -165,30 +158,3 @@ export function ListingInfo({
 }
 
 export default ListingInfo;
-
-{
-  /* <Field>
-            <FieldLabel htmlFor="start-date" className="text-nowrap text-base">
-              Start date:
-            </FieldLabel>
-            <Input
-              type="date"
-              id="start-date"
-              name="start-date"
-              required
-              className="max-w-50 cursor-pointer"
-            />
-          </Field>
-          <Field>
-            <FieldLabel htmlFor="end-date" className="text-nowrap text-base">
-              End date:
-            </FieldLabel>
-            <Input
-              type="date"
-              id="end-date"
-              name="end-date"
-              required
-              className="max-w-50 cursor-pointer"
-            />
-          </Field> */
-}
