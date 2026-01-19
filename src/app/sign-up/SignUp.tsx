@@ -67,6 +67,7 @@ const SignUp = ({
         return;
       }
       router.push("/");
+      router.refresh(); 
     } catch (err) {
       console.error(`Error signing up: ${(err as Error).message}`);
     } finally {

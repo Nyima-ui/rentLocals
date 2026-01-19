@@ -16,17 +16,17 @@ export async function proxy(request: NextRequest) {
         },
         setAll(cookiesToSet) {
           cookiesToSet.forEach(({ name, value }) =>
-            request.cookies.set(name, value)
+            request.cookies.set(name, value),
           );
           supabaseResponse = NextResponse.next({
             request,
           });
           cookiesToSet.forEach(({ name, value, options }) =>
-            supabaseResponse.cookies.set(name, value, options)
+            supabaseResponse.cookies.set(name, value, options),
           );
         },
       },
-    }
+    },
   );
 
   const pathname = request.nextUrl.pathname;
@@ -39,8 +39,8 @@ export async function proxy(request: NextRequest) {
     pathname.startsWith("/mybookings") ||
     pathname.startsWith("/myrentals");
 
-  const { data } = await supabase.auth.getUser();
-  const user = data?.user;
+  const { data } = await supabase.auth.getClaims();
+  const user = data?.claims;
 
   if (isProtectedRoute && !user) {
     const url = request.nextUrl.clone();

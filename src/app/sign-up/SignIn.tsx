@@ -27,6 +27,7 @@ const SignIn = ({
       const password = formData.get("password") as string;
       await signInUser({ email, password });
       router.push("/");
+      router.refresh();
     } catch (err) {
       console.error(`Error signing in ${(err as Error).message}`);
       setIsLoading(false);
