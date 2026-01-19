@@ -6,6 +6,12 @@ It’s a **rental marketplace** where people can rent items they don’t use oft
 
 ---
 
+## 🌐 Live Demo
+
+🚀 **Live App:** https://rent-locals.vercel.app/
+
+---
+
 ## 💡 What Problem Does It Solve?
 
 - Buying expensive items for short-term use doesn’t make sense
@@ -18,7 +24,7 @@ It’s a **rental marketplace** where people can rent items they don’t use oft
 
 ### 👤 Users
 - Create an account
-- Authenticate securely
+- Secure authentication
 - Manage their own listings
 
 ### 📦 Listings (CRUD)
@@ -38,7 +44,7 @@ It’s a **rental marketplace** where people can rent items they don’t use oft
 
 ### 💬 Chat & Coordination
 - Dedicated chat page after booking request
-- Real-time communication between renter & owner
+- Direct communication between renter & owner
 - View booking status
 - Decide pickup location
 - Payments handled **offline**
@@ -47,6 +53,17 @@ It’s a **rental marketplace** where people can rent items they don’t use oft
 - Email notifications when:
   - A booking is requested
   - An owner accepts a booking request
+
+---
+
+## 🛠 Tech Stack
+
+- **Framework:** Next.js (App Router)
+- **Language:** TypeScript
+- **Styling:** Tailwind CSS
+- **Backend & Auth:** Supabase
+- **Database:** PostgreSQL (via Supabase)
+- **Deployment:** Vercel
 
 ---
 
@@ -67,7 +84,7 @@ It’s a **rental marketplace** where people can rent items they don’t use oft
 ## 🚧 Project Status
 
 This project is actively evolving and will continue to improve with:
-- Better search & filters
+- Search & filters
 - Payments integration
 - User profiles
 - Booking management improvements
