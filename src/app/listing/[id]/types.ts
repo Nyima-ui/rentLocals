@@ -14,9 +14,9 @@ export interface Listing {
 
 export interface IncomingPrices {
   listing_id: string;
-  price_day: number;
-  price_week: number | null;
-  price_month: number | null;
+  price_day: string;
+  price_week: string | null;
+  price_month: string | null;
 }
 
 export interface Booking {
@@ -52,5 +52,5 @@ export interface RequestBookingActionProps {
   renterId: string;
   start: string;
   end: string;
-  pricePerDay: number;
+  pricePerDay: string;
 }

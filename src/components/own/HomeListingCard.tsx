@@ -31,7 +31,11 @@ const HomeListingCard = ({ listing }: ListingCardProps) => {
           <CardContent className="p-0">
             <CardFooter className="flex flex-col items-start px-1.5">
               <p className="truncate w-full">{listing.title}</p>
-              <p className="font-medium">{`$${listing.prices.price_day}/day`}</p>
+              <p className="truncate w-full">
+                {listing.prices.price_day.includes("$")
+                  ? `${listing.prices.price_day}/day`
+                  : `$${listing.prices.price_day}/day`}
+              </p>
             </CardFooter>
           </CardContent>
         </Card>

@@ -43,16 +43,9 @@ export async function approveRequest({
     });
   }
 
-  //fetch the pickup address
-  const { data: address, error: addressFetchError } = await supabase
-    .from("listings")
-    .select("pickup_location")
-    .eq("listing_id", listingId)
-    .single();
-
-  if (addressFetchError) throw addressFetchError;
-  // console.log(address);
-  return address.pickup_location;
+  // fetch and return pickup address
+  const pickupLocation = await getPickupLocation(listingId);
+  return pickupLocation;
 }
 
 export async function getPickupLocation(

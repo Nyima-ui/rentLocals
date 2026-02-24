@@ -92,7 +92,11 @@ export function ListingInfo({
       <form onSubmit={handleSubmit}>
         <CalendarClient dateRange={dateRange} setDateRange={setDateRange} />
         <div className="mt-10">
-          <FieldTitle className="text-3xl">{`$${prices?.price_day}`}</FieldTitle>
+          <FieldTitle className="text-3xl">
+            {prices?.price_day.includes("$")
+              ? `${prices?.price_day}/day`
+              : `$${prices?.price_day}/day`}
+          </FieldTitle>
           <FieldDescription className="mt-2!">Price for 1 day</FieldDescription>
         </div>
         {!user && (
@@ -132,18 +136,27 @@ export function ListingInfo({
         <p className="text-lg">Price for all periods</p>
         <div className="flex gap-5 mt-3">
           <div className="border grow text-center rounded-md py-1.5">
-            <p className="text-xl font-medium">{`$${prices?.price_day}`}</p>
+            <p className="text-xl font-medium">
+              {prices?.price_day.includes("$")
+                ? `${prices?.price_day}`
+                : `$${prices?.price_day}`}
+            </p>
             <p className="opacity-80">/day</p>
           </div>
           <div className="border grow text-center rounded-md py-1.5">
+            <p></p>
             <p className="text-xl font-medium">
-              {prices?.price_week ? `$${prices.price_week}` : `Not set`}
+              {prices?.price_week && prices.price_week.includes("$")
+                ? `${prices?.price_week}`
+                : `$${prices?.price_week}`}
             </p>
             <p className="opacity-80">/week</p>
           </div>
           <div className="border grow text-center rounded-md py-1.5">
             <p className="text-xl font-medium">
-              {prices?.price_month ? `$${prices.price_month}` : `Not set`}
+              {prices?.price_month && prices.price_month.includes("$")
+                ? `${prices?.price_month}`
+                : `$${prices?.price_month}`}
             </p>
             <p className="opacity-80">/month</p>
           </div>

@@ -53,8 +53,8 @@ export interface Listing {
   updated_at: string;
   user_id: string;
   prices: {
-    price_day: number;
-    price_week: number | null;
-    price_month: number | null;
+    price_day: string;
+    price_week: string | null;
+    price_month: string | null;
   };
 }
