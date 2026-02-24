@@ -1,14 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { fetchListing, getRandomUserId } from "./action";
 
 export async function GET(request: NextRequest) {
   try {
-    // const secret = request.headers.get("x-cron-secret");
-    // if (secret !== process.env.CRON_SECRET) {
-    //   return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    // }
-    const supabase = await createClient();
+    const secret = request.headers.get("x-cron-secret");
+    if (secret !== process.env.CRON_SECRET) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    const supabase = createAdminClient();
 
     const [{ user_id }, listing] = await Promise.all([
       getRandomUserId(),

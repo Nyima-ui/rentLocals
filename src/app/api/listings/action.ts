@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import {
   HYGGLO_BASE_URL,
   COUNTRIES,
@@ -73,7 +73,7 @@ export async function fetchListing(): Promise<Listing | null> {
 }
 
 export async function getRandomUserId() {
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const { data, error } = await supabase.from("profiles").select("user_id");
   if (error) throw error;
   return pickRandom(data);
