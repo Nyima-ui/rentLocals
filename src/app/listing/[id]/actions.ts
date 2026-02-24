@@ -66,7 +66,7 @@ export async function requestBookingAction({
       end_date: new Date(end).toISOString(),
       status: "requested",
       price_per_day: pricePerDay,
-      total_price: calculateTotalPrice(start, end, pricePerDay),
+      total_price: calculateTotalPrice(start, end, parseInt(pricePerDay, 10)),
     })
     .select()
     .single();

@@ -12,5 +12,5 @@ export interface BookingRequestEmailProps {
   start: string;
   end: string;
   bookingId: string;
-  pricePerDay: number;
+  pricePerDay: string;
 }

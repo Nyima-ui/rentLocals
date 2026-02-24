@@ -9,7 +9,7 @@ export function bookingRequestEmail({
   bookingId,
   pricePerDay,
 }: BookingRequestEmailProps) {
-  const total = calculateTotalPrice(start, end, pricePerDay);
+  const total = calculateTotalPrice(start, end, parseInt(pricePerDay, 10));
   return `<div style="font-family: sans-serif; line-height: 1.6;">
         <h2>New booking request</h2>
 

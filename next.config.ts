@@ -24,4 +24,3 @@ const nextConfig: NextConfig = {
 };
 
 export default nextConfig;
-// https://hygglo.imgix.net/fat-llama/products/macbook-pro-retina-mid2015-48227417.jpg?cs=strip&fm=pjpg&q=70)
