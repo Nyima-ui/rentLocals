@@ -1,14 +1,16 @@
-name: Insert Scraped Listing
+name: Scrape and Insert Listing
 
 on:
   schedule:
-    - cron: '0 0 * * 1,3,5,0'
+    # Runs at 00:00 UTC on Sun, Mon, Wed, Fri
+    - cron: "0 0 * * 0,1,3,5"
   workflow_dispatch:
 
 jobs:
-  insert-listing:
+  scrape-and-insert:
     runs-on: ubuntu-latest
     steps:
-      - name: Call insert API
+      - name: Trigger listing ingestion API
         run: |
-           curl -X GET
+          curl -X GET "https://rent-locals.vercel.app/api/listings" \
+            -H "x-cron-secret: ${{ secrets.CRON_SECRET }}"
